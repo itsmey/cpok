@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <ncurses.h>
 
 #include "defs.h"
 #include "player.h"
@@ -35,6 +36,11 @@ void game_init() {
   game.bet = 0;
   game.round = INIT;
   game.ui_choice = -1;
+
+  game.round_number = 0;
+
+  set_msg(0, "%s", "");
+  set_msg(1, "%s", "");
 }
 
 void game_start() {
@@ -42,13 +48,15 @@ void game_start() {
   ui_init();
 
   LOG("%s\n", "initialization done");
+  getch();
 
  /* while (!(game_end_condition())) {
     game_round();
   }*/
   game_round();
 
-  ui_msg("Game over!", 1);
+  ui_refresh_msg(M2, "%s", "Game over!");
+  getch();
 
   ui_destroy();
 }
@@ -57,6 +65,9 @@ void game_round() {
   counter_t i;
 
   LOG("%s\n", "new round");
+
+  game.round++;
+  ui_refresh_msg(M2, "Round %d", game.round);
 
   game_deal();
 
@@ -69,6 +80,7 @@ void game_round() {
 
   game.round = PREFLOP;
   game_blinds();
+  getch();
   while (game.round != END) {
     while (!game_equal_bets_condition()) {
       player_turn(game.current);
@@ -147,7 +159,7 @@ void game_blinds() {
   game.current = dealer->next->next->next;
   LOG("new current is %s\n", dealer->next->next->next->name);
 
-  ui_refresh_msg("Blinds paid.");
+  ui_refresh_msg(M1, "%s", "Blinds paid.");
 }
 
 void game_change_dealer() {

@@ -16,7 +16,7 @@
 
 #define PLAYERS_COUNT 4
 #define PLAYERS_NAMES {"Shurik", "Coward", "Fool", "Pro"}
-#define PLAYERS_AI {FALSE, TRUE, TRUE, TRUE}
+#define PLAYERS_AI {FALSE, FALSE, FALSE, FALSE}
 #define PLAYERS_POSX {15, 50, 85, 50}
 #define PLAYERS_POSY {40, 10, 40, 70}
 
@@ -38,6 +38,9 @@
 #define M_CALL   "  Call "
 #define M_BET    "  Bet  "
 #define M_RAISE  " Raise "
+
+#define M1 0
+#define M2 1
 
 #define CP_PNAME    1
 #define CP_PCURRENT 2

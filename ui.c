@@ -17,6 +17,19 @@ void print_center(int y, int x, char* str) {
   mvprintw(y, x - l / 2, str);
 }
 
+void print_msg(char* msg, int n_line) {
+  const int start_x = 2;
+  int max_y, max_x, y, x;
+
+  getmaxyx(stdscr, max_y, max_x);
+  y = max_y - n_line - 2;
+
+  for (x = start_x; x <= max_x - start_x; ++x)
+    mvaddch(y, x, ' ');
+
+  mvprintw(y, 2, "%s", msg);
+}
+
 void print_card(int y, int x, card_t card) {
   char buf[255];
   int color_pair;
@@ -60,7 +73,8 @@ void ui_init() {
   start_color();
   INIT_COLOR_PAIRS;
 
-  ui_refresh_msg("You are fucking Shurik. Press any fucking key to start.");
+  ui_refresh_msg(M1, "%s",
+    "You are fucking Shurik. Press any fucking key to start.");
 }
 
 void ui_destroy() {
@@ -116,25 +130,9 @@ void ui_refresh() {
   for (i = 0; i < revealed_cards; i++)
     print_card(y+1, x-cor+3*i, game.table[i]);
   PRINT(y+2, x, "bank: %u", game.bank);
-}
 
-void ui_refresh_msg(char* msg) {
-  ui_refresh();
-  ui_msg(msg, 1);
-  getch();
-}
-
-void ui_msg(char* msg, int n_line) {
-  const int start_x = 2;
-  int max_y, max_x, y, x;
-
-  getmaxyx(stdscr, max_y, max_x);
-  y = max_y - 1 - n_line;
-
-  for (x = start_x; x <= max_x - start_x; ++x)
-    mvaddch(y, x, ' ');
-
-  mvprintw(max_y - 2, 2, "%s", msg);
+  print_msg(game.msg[M1], M1);
+  print_msg(game.msg[M2], M2);
 }
 
 decision_t ui_selector(player_t* player) {

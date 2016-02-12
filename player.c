@@ -16,7 +16,7 @@ void player_bet(player_t* player, unsigned short amount) {
 void player_turn(player_t* player) {
   unsigned short raise_sum;
 
-  ui_refresh_msg(player->name);
+  ui_refresh_msg(M1, "%s turns.", player->name);
 
   if (player->is_ai) {
      /* TODO: AI */

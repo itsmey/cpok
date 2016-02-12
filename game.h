@@ -10,12 +10,14 @@ typedef enum {CHECK, CALL, BET, RAISE, FOLD} decision_t;
 
 typedef struct game_t {
   card_t table[TABLE_SIZE];
+  unsigned short round_number;
   unsigned short bank;
   unsigned short bet;
   short ui_choice;
   player_t players[PLAYERS_COUNT];
   player_t* current;
   round_t round;
+  char msg[2][255];
 } game_t;
 
 extern game_t game;

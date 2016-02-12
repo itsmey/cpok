@@ -5,7 +5,7 @@
 #include "card.h"
 
 typedef struct player_t {
-  char name[255];
+  char name[16];
   bool_t is_ai;
   bool_t is_dealer;
   bool_t is_in_game;
