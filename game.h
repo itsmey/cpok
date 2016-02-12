@@ -35,8 +35,9 @@ void game_change_dealer();
 void game_next_part();
 bool_t game_equal_bets_condition();
 player_t* game_last_player();
-void game_next_current();
+player_t* game_next_current();
 void game_collect_bank();
 void game_choose_winner();
+player_t* game_compare(player_t* player1, player_t* player2);
 
 #endif

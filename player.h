@@ -20,5 +20,7 @@ typedef struct player_t {
 void player_bet(player_t* player, unsigned short amount);
 void player_turn(player_t* player);
 void player_collect_bank(player_t* player);
+void player_bank(player_t* player);
+void player_raise(player_t* player);
 
 #endif

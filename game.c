@@ -238,9 +238,13 @@ void game_next_part() {
 
 void game_collect_bank() {
   counter_t i;
-
-  FOR_EACH_PLAYER(i)
-    game.bank += game.players[i].bet;
+  LOG("bank is %u\n", game.bank);
+  FOR_EACH_PLAYER(i) {
+    LOG("collecting %u from player %s\n",
+      game.players[i].bet, game.players[i].name);
+    player_bank(&game.players[i]);
+  }
+  LOG("bank is %u\n", game.bank);
 }
 
 player_t* game_last_player() {
@@ -260,7 +264,7 @@ player_t* game_last_player() {
     return NULL;
 }
 
-void game_next_current() {
+player_t* game_next_current() {
   player_t* last_player = game_last_player();
 
   if (last_player) {
@@ -272,9 +276,24 @@ void game_next_current() {
     } while (!game.current->is_in_game);
     LOG("next player is %s\n", game.current->name);
   }
-
+  return game.current;
 }
 
 void game_choose_winner() {
+  player_t* winner;
 
+  winner = game_last_player();
+  if (!winner) {
+    winner = game.current;
+    while (!game_last_player()) {
+      winner = game_compare(winner, game_next_current());
+    }
+  }
+
+  LOG("winner is %s\n", winner->name);
+  player_collect_bank(winner);
+}
+
+player_t* game_compare(player_t* player1, player_t* player2) {
+  return player1;
 }
