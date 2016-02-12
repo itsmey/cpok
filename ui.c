@@ -1,6 +1,8 @@
 #include <ncurses.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "defs.h"
 #include "ui.h"
@@ -124,7 +126,7 @@ void ui_refresh() {
     case FLOP: revealed_cards = 3; break;
     case TURN: revealed_cards = 4; break;
     case RIVER: revealed_cards = 5; break;
-    case END: revealed_cards = 5; break;
+    case END: revealed_cards = 0; break;
   }
   cor = 3 * revealed_cards / 2 - 1;
   for (i = 0; i < revealed_cards; i++)
@@ -221,4 +223,9 @@ decision_t decode_choice(char* choice) {
   if (!strcmp(choice, M_BET)) return BET;
   if (!strcmp(choice, M_RAISE)) return RAISE;
   return FOLD;
+}
+
+void ui_sleep(unsigned int seconds) {
+  refresh();
+  sleep(seconds);
 }

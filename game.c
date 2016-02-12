@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <unistd.h>
 
 #include "defs.h"
 #include "player.h"
@@ -27,6 +28,7 @@ void game_init() {
     game.players[i].bet = 0;
     game.players[i].is_in_game = FALSE;
     game.players[i].is_dealer = FALSE;
+    game.players[i].is_move_made = FALSE;
   }
 
   game.players[rand() % PLAYERS_COUNT].is_dealer = TRUE;
@@ -50,7 +52,7 @@ void game_start() {
   LOG("%s\n", "initialization done");
   getch();
 
- /* while (!(game_end_condition())) {
+  /*while (!(game_end_condition())) {
     game_round();
   }*/
   game_round();
@@ -67,7 +69,7 @@ void game_round() {
   LOG("%s\n", "new round");
 
   game.round++;
-  ui_refresh_msg(M2, "Round %d", game.round);
+  ui_refresh_msg(M2, "Round %d: pre-flop", game.round);
 
   game_deal();
 
@@ -80,7 +82,7 @@ void game_round() {
 
   game.round = PREFLOP;
   game_blinds();
-  getch();
+
   while (game.round != END) {
     while (!game_equal_bets_condition()) {
       player_turn(game.current);
@@ -89,6 +91,7 @@ void game_round() {
     game_next_part();
   }
 
+  LOG("%s\n", "Round ends. Change dealer");
   game_change_dealer();
 }
 
@@ -107,8 +110,12 @@ bool_t game_equal_bets_condition() {
   counter_t i;
 
   for (i = 0; i < PLAYERS_COUNT; i++)
-    if (game.players[i].is_in_game && game.players[i].bet != game.bet) {
-      LOG("%s\n", "equal bets condition - false. waiting next player");
+    if ((game.players[i].is_in_game) &&
+        (!game_last_player()) &&
+        ((game.players[i].bet != game.bet) ||
+        (!game.players[i].is_move_made))
+       ) {
+      LOG("%s\n", "equal bets condition - false. waiting for next player");
       return FALSE;
     }
 
@@ -159,7 +166,8 @@ void game_blinds() {
   game.current = dealer->next->next->next;
   LOG("new current is %s\n", dealer->next->next->next->name);
 
-  ui_refresh_msg(M1, "%s", "Blinds paid.");
+  ui_refresh_msg(M1, "%s", "Paying blinds...");
+  ui_sleep(1);
 }
 
 void game_change_dealer() {
@@ -181,15 +189,11 @@ void game_next_part() {
   player_t* last_player = game_last_player();
 
   if (last_player) {
+    game_collect_bank();
     player_collect_bank(last_player);
     game.round = END;
     return;
   }
-
-  for (i = 0; i < PLAYERS_COUNT; i++) {
-    game.players[i].bet = 0;
-  }
-  game.bet = 0;
 
   switch (game.round) {
     case INIT:
@@ -197,24 +201,38 @@ void game_next_part() {
       break;
     case PREFLOP:
       game_collect_bank();
+      LOG("%s\n", "changing round to FLOP");
+      set_msg(M2, "Round %d: flop", game.round);
       game.round = FLOP;
       break;
     case FLOP:
       game_collect_bank();
+      LOG("%s\n", "changing round to TURN");
+      set_msg(M2, "Round %d: turn", game.round);
       game.round = TURN;
       break;
     case TURN:
       game_collect_bank();
+      LOG("%s\n", "changing round to RIVER");
+      set_msg(M2, "Round %d: river", game.round);
       game.round = RIVER;
       break;
     case RIVER:
       game_collect_bank();
+      LOG("%s\n", "round ends");
       game.round = END;
       break;
     case END:
       game.round = INIT;
       break;
   }
+
+  for (i = 0; i < PLAYERS_COUNT; i++) {
+    game.players[i].bet = 0;
+    game.players[i].is_move_made = FALSE;
+  }
+  game.bet = 0;
+
 
   game.current = dealer->next;
 }

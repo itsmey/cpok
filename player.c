@@ -8,13 +8,16 @@
 
 void player_bet(player_t* player, unsigned short amount) {
   player->cash -= amount;
-  game.bank += amount;
+  /*game.bank += amount;*/
   player->bet += amount;
   LOG("%s bets %u\n", player->name, amount);
 }
 
 void player_turn(player_t* player) {
   unsigned short raise_sum;
+
+  if (player == game_last_player())
+    return;
 
   ui_refresh_msg(M1, "%s turns.", player->name);
 
@@ -46,11 +49,14 @@ void player_turn(player_t* player) {
         break;
     }
   }
+  player->is_move_made = TRUE;
 }
 
 void player_collect_bank(player_t* player) {
   player->cash += game.bank;
-  player->cash += player->bet;
+  /*player->cash += player->bet;*/
+
+  LOG("%s collects bank of %u\n", player->name, game.bank);
 
   game.bank = 0;
   player->bet = 0;

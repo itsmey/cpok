@@ -15,5 +15,6 @@ void ui_init();
 void ui_destroy();
 void ui_refresh();
 decision_t ui_selector(player_t* player);
+void ui_sleep(unsigned int seconds);
 
 #endif
