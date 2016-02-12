@@ -64,6 +64,18 @@ void print_player_name(int y, int x, player_t* player) {
   PRINT_ATTR(COLOR_PAIR(color_pair), y, x, "%s%s", player->name, button);
 }
 
+void print_panel(int x, int y) {
+  const char panel[] = "*----------------------*";
+  int l = strlen(panel);
+
+  mvprintw(y, x - l / 2, panel);
+  mvprintw(y+3, x - l / 2, panel);
+  mvprintw(y+1, x - l / 2, "|");
+  mvprintw(y+1, x + l / 2 - 1, "|");
+  mvprintw(y+2, x - l / 2, "|");
+  mvprintw(y+2, x + l / 2 - 1, "|");
+}
+
 void ui_init() {
 
   initscr();
@@ -132,6 +144,8 @@ void ui_refresh() {
   for (i = 0; i < revealed_cards; i++)
     print_card(y+1, x-cor+3*i, game.table[i]);
   PRINT(y+2, x, "bank: %u", game.bank);
+
+  print_panel(x, y);
 
   print_msg(game.msg[M1], M1);
   print_msg(game.msg[M2], M2);

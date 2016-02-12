@@ -37,5 +37,6 @@ bool_t game_equal_bets_condition();
 player_t* game_last_player();
 void game_next_current();
 void game_collect_bank();
+void game_choose_winner();
 
 #endif

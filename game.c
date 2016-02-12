@@ -197,7 +197,6 @@ void game_next_part() {
 
   switch (game.round) {
     case INIT:
-      game.round = PREFLOP;
       break;
     case PREFLOP:
       game_collect_bank();
@@ -220,10 +219,10 @@ void game_next_part() {
     case RIVER:
       game_collect_bank();
       LOG("%s\n", "round ends");
+      game_choose_winner();
       game.round = END;
       break;
     case END:
-      game.round = INIT;
       break;
   }
 
@@ -273,5 +272,9 @@ void game_next_current() {
     } while (!game.current->is_in_game);
     LOG("next player is %s\n", game.current->name);
   }
+
+}
+
+void game_choose_winner() {
 
 }
