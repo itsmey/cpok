@@ -124,6 +124,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
 
   if (pok_compare(pool, p) == NULL) {
     /* we tie */
+    player->is_tie = TRUE;
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
     ui_refresh();
     ui_wait_any_key();
