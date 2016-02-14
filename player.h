@@ -22,5 +22,6 @@ void player_turn(player_t* player);
 void player_collect_bank(player_t* player);
 void player_bank(player_t* player);
 void player_raise(player_t* player);
+void player_fill_pool(player_t* player, card_t **pool);
 
 #endif

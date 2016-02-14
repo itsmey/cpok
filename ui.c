@@ -36,7 +36,9 @@ void print_card(int y, int x, card_t card) {
   char buf[255];
   int color_pair;
 
-  color_pair = ((card[SUIT] == 'd') || (card[SUIT] == 'h')) ? 5 : 4;
+  color_pair = ((card[SUIT] == 'd') || (card[SUIT] == 'h')) ?
+    CP_CARD_DH :
+    CP_CARD_CS;
 
   PRINT_ATTR(A_BOLD | COLOR_PAIR(color_pair),
       y, x, "%c%c", card[RANK], card[SUIT]);

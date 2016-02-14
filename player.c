@@ -69,3 +69,13 @@ void player_collect_bank(player_t* player) {
   player->cash += game.bank;
   game.bank = 0;
 }
+
+void player_fill_pool(player_t* player, card_t **pool) {
+  counter_t i;
+
+  pool[0] = &player->pocket[0];
+  pool[1] = &player->pocket[1];
+
+  for(i = 0; i < TABLE_SIZE; i++)
+    pool[2+i] = &game.table[i];
+}
