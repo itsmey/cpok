@@ -62,10 +62,15 @@
 
 extern FILE* log_file;
 
+#ifdef LOGGING
 #define LOG(F, ...) {\
       log_file = fopen("log", "a");\
       fprintf(log_file, F, __VA_ARGS__);\
       fclose(log_file);}
+#else
+#define LOG(F, ...)
+#endif
+
 
 #define PRINT(y, x, F, ...) {\
       sprintf(buf, F, __VA_ARGS__);\

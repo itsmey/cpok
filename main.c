@@ -14,14 +14,16 @@ int main() {
 
   srand(time(NULL));
 
-  /*#ifdef TESTING
+  #ifdef TESTS
 
   test();
   return 0;
 
-  #endif*/
+  #else
 
   game_start();
+
+  #endif
 
   return 0;
 }
