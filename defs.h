@@ -8,8 +8,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define W_INFO_HEIGHT 16
-#define W_INFO_WIDTH 48
+#define W_INFO_HEIGHT 10
+#define W_INFO_WIDTH 40
 
 #define RANKS "23456789TJQKA"
 #define SUITS "hdcs"
@@ -80,14 +80,6 @@ extern FILE* log_file;
       sprintf(buf, F, __VA_ARGS__);\
       print_center(stdscr, y, x, buf);\
       attroff(Attr);}
-
-#define REVEAL(Player, Pool) {\
-    player_fill_pool(Player, Pool);\
-    LOG("revealing %s\n", Player->name);\
-    sprintf(msg[n_lines], "%s reveals:", Player->name);\
-    n_lines++;\
-    card_combo_to_text(msg[n_lines], pok_resolve(Pool));\
-    n_lines++;}
 
 typedef unsigned char bool_t;
 typedef unsigned char byte_t;

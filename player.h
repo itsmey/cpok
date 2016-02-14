@@ -10,6 +10,7 @@ typedef struct player_t {
   bool_t is_dealer;
   bool_t is_in_game;
   bool_t is_move_made;
+  bool_t is_tie;
   card_t pocket[HAND_SIZE];
   unsigned short cash;
   unsigned short bet;
@@ -23,5 +24,6 @@ void player_collect_bank(player_t* player);
 void player_bank(player_t* player);
 void player_raise(player_t* player);
 void player_fill_pool(player_t* player, card_t **pool);
+player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool);
 
 #endif

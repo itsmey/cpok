@@ -5,6 +5,7 @@
 #include "player.h"
 #include "game.h"
 #include "ui.h"
+#include "pok.h"
 
 void player_bet(player_t* player, unsigned short amount) {
   player->cash -= amount;
@@ -78,4 +79,56 @@ void player_fill_pool(player_t* player, card_t **pool) {
 
   for(i = 0; i < TABLE_SIZE; i++)
     pool[2+i] = &game.table[i];
+}
+
+player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
+  counter_t i;
+  card_t *p[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  char str_combo[255];
+
+  player_fill_pool(player, p);
+  card_combo_to_text(str_combo, pok_resolve(p));
+
+  if (!yet_winner) {
+    LOG("yet_winner now is %s\n", yet_winner->name);
+    for(i = 0; i < POOL_SIZE; i++)
+      pool[i] = p[i];
+    set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    ui_refresh();
+    ui_wait_any_key();
+    return player;
+  }
+
+  if (pok_compare(pool, p) == pool) {
+    /* we lose! fold */
+    set_msg(M1, "%s folds. Press any key.", player->name);
+    player_bank(player);
+    player->is_in_game = FALSE;
+    ui_refresh();
+    ui_wait_any_key();
+    return yet_winner;
+  }
+
+  if (pok_compare(pool, p) == p) {
+    /* we win (for now) */
+    yet_winner->is_in_game = FALSE;
+    LOG("%s lefts the game\n", yet_winner->name);
+    yet_winner = player;
+    for(i = 0; i < POOL_SIZE; i++)
+      pool[i] = p[i];
+    set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    ui_refresh();
+    ui_wait_any_key();
+    return player;
+  }
+
+  if (pok_compare(pool, p) == NULL) {
+    /* we tie */
+    set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    ui_refresh();
+    ui_wait_any_key();
+    return yet_winner;
+  }
+
+  return NULL;  /* unreachable */
 }

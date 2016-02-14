@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <ncurses.h>
 #include <unistd.h>
 
 #include "defs.h"
@@ -8,7 +7,6 @@
 #include "game.h"
 #include "card.h"
 #include "ui.h"
-#include "pok.h"
 
 game_t game;
 card_t* global_pool[GLOBAL_POOL_SIZE];
@@ -30,6 +28,7 @@ void game_init() {
     game.players[i].is_in_game = FALSE;
     game.players[i].is_dealer = FALSE;
     game.players[i].is_move_made = FALSE;
+    game.players[i].is_tie = FALSE;
   }
 
   game.players[rand() % PLAYERS_COUNT].is_dealer = TRUE;
@@ -51,7 +50,7 @@ void game_start() {
   ui_init();
 
   LOG("%s\n", "initialization done");
-  getch();
+  ui_wait_any_key();
 
   while (!(game_end_condition())) {
     game_round();
@@ -59,7 +58,7 @@ void game_start() {
   /*game_round();*/
 
   ui_refresh_msg(M2, "%s", "Game over!");
-  getch();
+  ui_wait_any_key();
 
   ui_destroy();
 }
@@ -77,6 +76,7 @@ void game_round() {
   for (i = 0; i < PLAYERS_COUNT; i++) {
     game.players[i].bet = 0;
     game.players[i].is_in_game = TRUE;
+    game.players[i].is_tie = FALSE;
   }
 
   LOG("%s\n", "PREFLOP");
@@ -192,16 +192,9 @@ void game_change_dealer() {
 void game_next_part() {
   counter_t i;
   player_t* dealer = game_get_dealer();
-  player_t* last_player = game_last_player();
-  char header[255];
-  char msg[1][W_INFO_WIDTH-2];
 
-  if (last_player) {
-    game_collect_bank();
-    sprintf(header, "[ Round %u summary ]", game.r_number);
-    sprintf(msg[0], "%s collects bank of %u.", last_player->name, game.bank);
-    ui_info_window(header, msg[0], 1);
-    player_collect_bank(last_player);
+  if (game_last_player()) {
+    game_declare_winner();
     game.round = END;
     return;
   }
@@ -292,51 +285,33 @@ player_t* game_next_current() {
 }
 
 void game_choose_winner() {
-  player_t *winner, *player1, *player2;
-  char header[255];
-  char msg[16][W_INFO_WIDTH-2];
-  byte_t n_lines = 0;
-  card_t *pool1[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
-         *pool2[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  card_t *pool[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  player_t *yet_winner = NULL;
 
-  LOG("%s\n", "choosing winner");
+  set_msg(M2, "%s", "Revealing cards...");
 
-  winner = game_last_player();
-  if (!winner) {
-
-    LOG("%s\n", "there are 2 or more players still in game");
-
-    player1 = game.current;
-    REVEAL(player1, pool1);
-
-    player2 = game_next_current();
-    REVEAL(player2, pool2);
-
-    while (!game_last_player()) {
-
-      LOG("%s\n", "while loop");
-      if (pok_compare(pool1, pool2) == pool1) {
-        player2->is_in_game = FALSE;
-        player2 = game_next_current();
-        REVEAL(player2, pool2);
-      } else {
-        player1->is_in_game = FALSE;
-        player1 = game_next_current();
-        REVEAL(player1, pool1);
-      }
-    }
+  while (!game_last_player()) {
+    yet_winner = player_reveal(game.current, yet_winner, pool);
+    game_next_current();
   }
 
-  winner = game_last_player();
-
-  LOG("winner is %s\n", winner->name);
-  sprintf(header, "[ Round %u summary ]", game.r_number);
-  sprintf(msg[n_lines], "%s collects bank of %u.", winner->name, game.bank);
-  n_lines++;
-  ui_info_window(header, msg[0], n_lines);
-  player_collect_bank(winner);
+  if (!game_declare_tie()) {
+    game_declare_winner();
+  }
 }
 
-player_t* game_compare(player_t* player1, player_t* player2) {
-  return player1;
+bool_t game_declare_tie() {
+  return FALSE;
+}
+
+void game_declare_winner() {
+  char header[255];
+  char msg[1][W_INFO_WIDTH-2];
+  player_t *last = game_last_player();
+
+  game_collect_bank();
+  sprintf(header, "[ Round %u summary ]", game.r_number);
+  sprintf(msg[0], "%s collects bank of %u.", last->name, game.bank);
+  ui_info_window(header, msg[0], 1);
+  player_collect_bank(last);
 }

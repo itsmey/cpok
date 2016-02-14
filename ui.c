@@ -282,3 +282,7 @@ void ui_info_window(char* header, char* first_line, byte_t n_lines) {
   delwin(w_info);
   refresh();
 }
+
+void ui_wait_any_key() {
+  getch();
+}

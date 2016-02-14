@@ -38,6 +38,7 @@ player_t* game_last_player();
 player_t* game_next_current();
 void game_collect_bank();
 void game_choose_winner();
-player_t* game_compare(player_t* player1, player_t* player2);
+bool_t game_declare_tie();
+void game_declare_winner();
 
 #endif

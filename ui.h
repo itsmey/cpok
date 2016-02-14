@@ -17,5 +17,6 @@ void ui_refresh();
 decision_t ui_selector(player_t* player);
 void ui_sleep(unsigned int seconds);
 void ui_info_window(char* header, char* first_line, byte_t n_lines);
+void ui_wait_any_key();
 
 #endif
