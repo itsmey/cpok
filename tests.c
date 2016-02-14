@@ -46,6 +46,7 @@ void randomize_pool(card_t** pool, card_t* pool_cards) {
 
 combo_t resolve_pool(card_t** pool) {
   combo_t result;
+  char str[255];
 
   result = pok_resolve(pool);
 
@@ -54,6 +55,8 @@ combo_t resolve_pool(card_t** pool) {
   printf(" kickers ");
   print_pool(result.kickers, KICKERS_COUNT);
   printf("\n");
+  card_combo_to_text(str, result);
+  printf("card_combo_to_text: %s\n", str);
 
   return result;
 }

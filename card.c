@@ -87,3 +87,24 @@ void card_copy(card_t from, card_t to) {
   to[SUIT] = from[SUIT];
 }
 
+void card_combo_to_text(char* str, combo_t combo) {
+  char kickers_line[32] = "";
+  char rank_line[8] = "";
+  counter_t i;
+
+  if (combo.kickers[0]) {
+    strcat(kickers_line, ", kicker(s): ");
+    for(i = 0; i < KICKERS_COUNT; i++)
+      if (combo.kickers[i]) {
+        strncat(kickers_line, *combo.kickers[i], 2);
+        strcat(kickers_line, " ");
+      }
+  }
+
+  if (combo.rank[1])
+    sprintf(rank_line, "(%c, %c)", (*combo.rank[0])[RANK], (*combo.rank[1])[RANK]);
+  else
+    sprintf(rank_line, "(%c)", (*combo.rank[0])[RANK]);
+
+  sprintf(str, "%s %s%s", card_kind_to_text(combo.kind), rank_line, kickers_line);
+}

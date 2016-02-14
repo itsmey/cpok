@@ -192,13 +192,14 @@ void game_next_part() {
   counter_t i;
   player_t* dealer = game_get_dealer();
   player_t* last_player = game_last_player();
-  char header[255], msg[255];
+  char header[255];
+  char msg[1][W_INFO_WIDTH-2];
 
   if (last_player) {
     game_collect_bank();
     sprintf(header, "[ Round %u summary ]", game.r_number);
-    sprintf(msg, "%s collects bank of %u", last_player->name, game.bank);
-    ui_info_window(header, msg);
+    sprintf(msg[0], "%s collects bank of %u.", last_player->name, game.bank);
+    ui_info_window(header, msg[0], 1);
     player_collect_bank(last_player);
     game.round = END;
     return;

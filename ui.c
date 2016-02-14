@@ -244,10 +244,12 @@ void ui_sleep(unsigned int seconds) {
   sleep(seconds);
 }
 
-void ui_info_window(char* header, char* text) {
+void ui_info_window(char* header, char* first_line, byte_t n_lines) {
   WINDOW* w_info;
   int max_y, max_x;
+  counter_t i;
   char buf[255];
+  char *line;
 
   LOG("%s\n", "Printing info window");
   getmaxyx(stdscr, max_y, max_x);
@@ -257,17 +259,24 @@ void ui_info_window(char* header, char* text) {
                   max_y / 2 -  W_INFO_HEIGHT / 2,
                   max_x / 2 -  W_INFO_WIDTH / 2);
 
+  wbkgd(w_info, COLOR_PAIR(CP_PCURRENT));
   box(w_info, 0, 0);
   /*wborder(w_info, '|', '|', '-', '-', '+', '+', '+', '+');*/
 
   WPRINT(w_info, 0, W_INFO_WIDTH / 2, "%s", header);
-  mvwprintw(w_info, 2, 2, text);
+
+  line = first_line;
+  for (i = 0; i < n_lines; i++) {
+    mvwprintw(w_info, 2 + i, 2, line);
+    line += W_INFO_WIDTH - 2;
+  }
+
   WPRINT(w_info, W_INFO_HEIGHT - 2, W_INFO_WIDTH / 2, "%s",
     "Press any key to continue.");
 
   wrefresh(w_info);
 
-  getch();
+  wgetch(w_info);
   delwin(w_info);
   refresh();
 }

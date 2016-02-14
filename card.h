@@ -36,5 +36,6 @@ bool_t card_cmp_suits(card_t card1, card_t card2);
 bool_t card_cmp_ranks(card_t card1, card_t card2);
 char * card_kind_to_text(hand_kind_t kind);
 void card_copy(card_t from, card_t to);
+void card_combo_to_text(char* str, combo_t combo);
 
 #endif
