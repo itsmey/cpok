@@ -13,10 +13,10 @@ byte_t fill_choices(char** choices, player_t* player, size_t size);
 void print_choices(int y, int x, char** choices, size_t size);
 decision_t decode_choice(char* choice);
 
-void print_center(int y, int x, char* str) {
+void print_center(WINDOW *w, int y, int x, char* str) {
   int l = strlen(str);
 
-  mvprintw(y, x - l / 2, str);
+  mvwprintw(w, y, x - l / 2, str);
 }
 
 void print_msg(char* msg, int n_line) {
@@ -242,4 +242,32 @@ decision_t decode_choice(char* choice) {
 void ui_sleep(unsigned int seconds) {
   refresh();
   sleep(seconds);
+}
+
+void ui_info_window(char* header, char* text) {
+  WINDOW* w_info;
+  int max_y, max_x;
+  char buf[255];
+
+  LOG("%s\n", "Printing info window");
+  getmaxyx(stdscr, max_y, max_x);
+
+  w_info = newwin(W_INFO_HEIGHT,
+                  W_INFO_WIDTH,
+                  max_y / 2 -  W_INFO_HEIGHT / 2,
+                  max_x / 2 -  W_INFO_WIDTH / 2);
+
+  box(w_info, 0, 0);
+  /*wborder(w_info, '|', '|', '-', '-', '+', '+', '+', '+');*/
+
+  WPRINT(w_info, 0, W_INFO_WIDTH / 2, "%s", header);
+  mvwprintw(w_info, 2, 2, text);
+  WPRINT(w_info, W_INFO_HEIGHT - 2, W_INFO_WIDTH / 2, "%s",
+    "Press any key to continue.");
+
+  wrefresh(w_info);
+
+  getch();
+  delwin(w_info);
+  refresh();
 }

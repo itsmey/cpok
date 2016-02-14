@@ -39,7 +39,7 @@ void game_init() {
   game.round = INIT;
   game.ui_choice = -1;
 
-  game.round_number = 0;
+  game.r_number = 0;
 
   set_msg(0, "%s", "");
   set_msg(1, "%s", "");
@@ -52,10 +52,10 @@ void game_start() {
   LOG("%s\n", "initialization done");
   getch();
 
-  /*while (!(game_end_condition())) {
+  while (!(game_end_condition())) {
     game_round();
-  }*/
-  game_round();
+  }
+  /*game_round();*/
 
   ui_refresh_msg(M2, "%s", "Game over!");
   getch();
@@ -68,8 +68,8 @@ void game_round() {
 
   LOG("%s\n", "new round");
 
-  game.round++;
-  ui_refresh_msg(M2, "Round %d: pre-flop", game.round);
+  game.r_number++;
+  ui_refresh_msg(M2, "Round %d: pre-flop", game.r_number);
 
   game_deal();
 
@@ -97,13 +97,16 @@ void game_round() {
 
 bool_t game_end_condition() {
   counter_t i;
+  bool_t result;
   byte_t bankrupts_count = 0;
 
   for (i = 0; i < PLAYERS_COUNT; i++)
     if (game.players[i].cash <= 0)
       bankrupts_count++;
 
-  return (bankrupts_count == PLAYERS_COUNT - 1);
+  result = (bankrupts_count == PLAYERS_COUNT - 1);
+  LOG("game end condition: %u\n", result);
+  return result;
 }
 
 bool_t game_equal_bets_condition() {
@@ -179,6 +182,8 @@ void game_change_dealer() {
       game.players[i].is_dealer = FALSE;
       next = game.players[i].next;
       next->is_dealer = TRUE;
+      LOG("dealer is %s\n", next->name);
+      break;
     }
   }
 }
@@ -187,9 +192,13 @@ void game_next_part() {
   counter_t i;
   player_t* dealer = game_get_dealer();
   player_t* last_player = game_last_player();
+  char header[255], msg[255];
 
   if (last_player) {
     game_collect_bank();
+    sprintf(header, "[ Round %u summary ]", game.r_number);
+    sprintf(msg, "%s collects bank of %u", last_player->name, game.bank);
+    ui_info_window(header, msg);
     player_collect_bank(last_player);
     game.round = END;
     return;
@@ -240,9 +249,11 @@ void game_collect_bank() {
   counter_t i;
   LOG("bank is %u\n", game.bank);
   FOR_EACH_PLAYER(i) {
-    LOG("collecting %u from player %s\n",
-      game.players[i].bet, game.players[i].name);
-    player_bank(&game.players[i]);
+    if (game.players[i].bet > 0) {
+      LOG("collecting %u from player %s\n",
+        game.players[i].bet, game.players[i].name);
+      player_bank(&game.players[i]);
+    }
   }
   LOG("bank is %u\n", game.bank);
 }

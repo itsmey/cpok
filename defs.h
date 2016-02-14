@@ -8,6 +8,9 @@
 #define TRUE 1
 #define FALSE 0
 
+#define W_INFO_HEIGHT 10
+#define W_INFO_WIDTH 40
+
 #define RANKS "23456789TJQKA"
 #define SUITS "hdcs"
 
@@ -66,12 +69,16 @@ extern FILE* log_file;
 
 #define PRINT(y, x, F, ...) {\
       sprintf(buf, F, __VA_ARGS__);\
-      print_center(y, x, buf);}
+      print_center(stdscr, y, x, buf);}
+
+#define WPRINT(w, y, x, F, ...) {\
+      sprintf(buf, F, __VA_ARGS__);\
+      print_center(w, y, x, buf);}
 
 #define PRINT_ATTR(Attr, y, x, F, ...) {\
       attron(Attr);\
       sprintf(buf, F, __VA_ARGS__);\
-      print_center(y, x, buf);\
+      print_center(stdscr, y, x, buf);\
       attroff(Attr);}
 
 typedef unsigned char bool_t;
