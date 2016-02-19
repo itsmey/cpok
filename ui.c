@@ -13,12 +13,6 @@ byte_t fill_choices(char** choices, player_t* player, size_t size);
 void print_choices(int y, int x, char** choices, size_t size);
 decision_t decode_choice(char* choice);
 
-void print_center(WINDOW *w, int y, int x, char* str) {
-  int l = strlen(str);
-
-  mvwprintw(w, y, x - l / 2, str);
-}
-
 void print_msg(char* msg, int n_line) {
   const int start_x = 2;
   int max_y, max_x, y, x;
@@ -88,9 +82,6 @@ void ui_init() {
 
   start_color();
   INIT_COLOR_PAIRS;
-
-  ui_refresh_msg(M1, "%s",
-    "You are fucking Shurik. Press any fucking key to start.");
 }
 
 void ui_destroy() {

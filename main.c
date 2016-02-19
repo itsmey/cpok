@@ -15,14 +15,9 @@ int main() {
   srand(time(NULL));
 
   #ifdef TESTS
-
-  test();
-  return 0;
-
+    test();
   #else
-
-  game_start();
-
+    game_start();
   #endif
 
   return 0;

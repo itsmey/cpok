@@ -7,6 +7,7 @@
 #include "game.h"
 #include "card.h"
 #include "ui.h"
+#include "settings.h"
 
 game_t game;
 card_t* global_pool[GLOBAL_POOL_SIZE];
@@ -46,16 +47,20 @@ void game_init() {
 }
 
 void game_start() {
-  game_init();
+  settings_init(settings);
   ui_init();
+  settings_show();
+  game_init();
+  ui_refresh_msg(M1, "%s",
+    "You are fucking Shurik. Press any fucking key to start.");
 
   LOG("%s\n", "initialization done");
+
   ui_wait_any_key();
 
   while (!(game_end_condition())) {
     game_round();
   }
-  /*game_round();*/
 
   ui_refresh_msg(M2, "%s", "Game over!");
   ui_wait_any_key();

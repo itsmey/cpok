@@ -31,6 +31,12 @@
 #define POOL_SIZE (HAND_SIZE + TABLE_SIZE)
 #define GLOBAL_POOL_SIZE (TABLE_SIZE + HAND_SIZE * PLAYERS_COUNT)
 
+#define INITIAL_CASH_DEF 1000
+#define BIG_BLIND_DEF 10
+#define MAX_RAISE_DEF 160
+#define AI_DIFF_DEF DUMB
+#define SPEED_DEF SLOW
+
 #define INITIAL_CASH 1000
 #define BIG_BLIND 10
 #define SMALL_BLIND (BIG_BLIND / 2)
@@ -71,19 +77,18 @@ extern FILE* log_file;
 #define LOG(F, ...)
 #endif
 
-
 #define PRINT(y, x, F, ...) {\
       sprintf(buf, F, __VA_ARGS__);\
-      print_center(stdscr, y, x, buf);}
+      mvwprintw(stdscr, y, x - strlen(buf) / 2, buf);}
 
 #define WPRINT(w, y, x, F, ...) {\
       sprintf(buf, F, __VA_ARGS__);\
-      print_center(w, y, x, buf);}
+      mvwprintw(w, y, x - strlen(buf) / 2, buf);}
 
 #define PRINT_ATTR(Attr, y, x, F, ...) {\
       attron(Attr);\
       sprintf(buf, F, __VA_ARGS__);\
-      print_center(stdscr, y, x, buf);\
+      mvwprintw(stdscr, y, x - strlen(buf) / 2, buf);\
       attroff(Attr);}
 
 typedef unsigned char bool_t;

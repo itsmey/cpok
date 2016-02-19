@@ -8,8 +8,8 @@ CFLAGS = -g -ansi -Wall -Werror -DLOGGING
 default: $(TARGET)
 all: default
 
-OBJECTS = main.o card.o tests.o pok.o player.o game.o ui.o
-HEADERS = defs.h card.h tests.h pok.h player.h game.h ui.h obscene.h
+OBJECTS = main.o card.o tests.o pok.o player.o game.o ui.o settings.o
+HEADERS = defs.h card.h tests.h pok.h player.h game.h ui.h settings.h obscene.h
 
 %.o: %.c $(HEADERS)
 		$(CC) $(CFLAGS) -c $< -o $@
