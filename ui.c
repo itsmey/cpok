@@ -209,7 +209,6 @@ byte_t fill_choices(char** choices, player_t* player, size_t size) {
 void print_choices(int y, int x, char** choices, size_t size) {
   counter_t i;
   /*LOG("printing menu y = %d x = %d choice = %d\n", y, x, game.ui_choice);*/
-
   for(i = 0; i < size; i++) {
     if (choices[i]) {
       if (game.ui_choice == i) {

@@ -37,10 +37,10 @@
 #define AI_DIFF_DEF DUMB
 #define SPEED_DEF SLOW
 
-#define INITIAL_CASH 1000
-#define BIG_BLIND 10
+#define INITIAL_CASH settings.cash
+#define BIG_BLIND settings.blind
 #define SMALL_BLIND (BIG_BLIND / 2)
-#define MAX_RAISE  160
+#define MAX_RAISE  settings.max_bet
 
 #define M_FOLD   "  Fold "
 #define M_CHECK  " Check "

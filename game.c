@@ -47,7 +47,7 @@ void game_init() {
 }
 
 void game_start() {
-  settings_init(settings);
+  settings_init(&settings);
   ui_init();
   settings_show();
   game_init();

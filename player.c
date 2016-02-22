@@ -6,6 +6,7 @@
 #include "game.h"
 #include "ui.h"
 #include "pok.h"
+#include "settings.h"
 
 void player_bet(player_t* player, unsigned short amount) {
   player->cash -= amount;
