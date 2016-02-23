@@ -5,11 +5,15 @@
 #include "card.h"
 #include "pok.h"
 
-void sort_by_rank(card_t** pool) {
+byte_t kickers_count(byte_t size) {
+  return (size >= TABLE_SIZE) ? KICKERS_COUNT : size - 1;
+}
+
+void sort_by_rank(card_t** pool, byte_t size) {
   card_t* temp;
   int i, j;
 
-  for (i = 0; i < POOL_SIZE-1; ++i) {
+  for (i = 0; i < size-1; ++i) {
     for (j = i; j >= 0; j--) {
       if (strchr(RANKS, (*pool[j+1])[RANK]) > strchr(RANKS, (*pool[j])[RANK])) {
         temp = pool[j];
@@ -20,13 +24,13 @@ void sort_by_rank(card_t** pool) {
   }
 }
 
-void fill_reps(card_t** pool, byte_t* reps) {
+void fill_reps(card_t** pool, byte_t* reps, byte_t size) {
   counter_t i, j;
   byte_t rep;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  for (i = 0; i < size; ++i) {
     rep = 1;
-    for (j = 0; j < POOL_SIZE; ++j)   {
+    for (j = 0; j < size; ++j)   {
       if (pool[i] != pool[j]) {
         if ( (*pool[i])[RANK] == (*pool[j])[RANK] )
           rep++;
@@ -36,19 +40,19 @@ void fill_reps(card_t** pool, byte_t* reps) {
   }
 }
 
-void fill_dist(card_t** pool, byte_t* dist) {
+void fill_dist(card_t** pool, byte_t* dist, byte_t size) {
   counter_t i;
 
-  for (i = 0; i < POOL_SIZE-1; ++i) {
+  for (i = 0; i < size-1; ++i) {
     dist[i] = strchr(RANKS, (*pool[i])[RANK]) - strchr(RANKS, (*pool[i+1])[RANK]);
   }
 }
 
-byte_t suit_count(card_t** pool, char suit) {
+byte_t suit_count(card_t** pool, char suit, byte_t size) {
   counter_t i;
   byte_t count = 0;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  for (i = 0; i < size; ++i) {
     if ( (*pool[i])[SUIT] == suit)
       count++;
   }
@@ -56,17 +60,19 @@ byte_t suit_count(card_t** pool, char suit) {
   return count;
 }
 
-bool_t four_of_a_kind(card_t** pool, combo_t* result) {
+bool_t four_of_a_kind(card_t** pool, combo_t* result, byte_t size) {
   byte_t reps[POOL_SIZE];
   counter_t i, j;
 
-  fill_reps(pool, reps);
+  if (size < 4) return FALSE;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  fill_reps(pool, reps, size);
+
+  for (i = 0; i < size; ++i) {
     if (reps[i] == 4) {
       result->kind = FOUR;
       result->rank[0] = pool[i];
-      for (j = 0; j < POOL_SIZE; j++) {
+      for (j = 0; j < size; j++) {
         if (reps[j] != 4) {
           result->kickers[0] = pool[j];
           return TRUE;
@@ -78,15 +84,17 @@ bool_t four_of_a_kind(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t full_house(card_t** pool, combo_t* result) {
+bool_t full_house(card_t** pool, combo_t* result, byte_t size) {
   byte_t reps[POOL_SIZE];
   counter_t i, j;
 
-  fill_reps(pool, reps);
+  if (size < 5) return FALSE;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  fill_reps(pool, reps, size);
+
+  for (i = 0; i < size; ++i) {
     if (reps[i] == 3) {
-      for (j = 0; j < POOL_SIZE; j++) {
+      for (j = 0; j < size; j++) {
         if (   (reps[j] == 2)  ||
              ( (reps[j] == 3) && ((*pool[j])[RANK] != (*pool[i])[RANK]) )
             ) {
@@ -102,13 +110,15 @@ bool_t full_house(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t flush(card_t** pool, combo_t* result) {
+bool_t flush(card_t** pool, combo_t* result, byte_t size) {
   counter_t i, j;
 
+  if (size < 5) return FALSE;
+
   for (i = 0; i < strlen(SUITS); ++i) {
-    if (suit_count(pool, SUITS[i]) >= 5) {
+    if (suit_count(pool, SUITS[i], size) >= 5) {
       result->kind = FLUSH;
-      for (j = 0; j < POOL_SIZE; ++j) {
+      for (j = 0; j < size; ++j) {
         if ((*pool[j])[SUIT] == SUITS[i]) {
           if (!result->rank[0]) result->rank[0] = pool[j]; else
             if (!result->kickers[0]) result->kickers[0] = pool[j]; else
@@ -124,16 +134,18 @@ bool_t flush(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t straight(card_t** pool, combo_t* result) {
+bool_t straight(card_t** pool, combo_t* result, byte_t size) {
   byte_t dist[POOL_SIZE-1];
   byte_t chain;
   counter_t i;
   card_t* first;
 
-  fill_dist(pool, dist);
+  if (size < 5) return FALSE;
+
+  fill_dist(pool, dist, size);
 
   chain = 0;
-  for (i = 0; i < POOL_SIZE-1; ++i) {
+  for (i = 0; i < size-1; ++i) {
     if (!chain) first = pool[i];
     if ((dist[i] == 1) || (dist[i] == 0)) {
       chain += dist[i];
@@ -150,9 +162,9 @@ bool_t straight(card_t** pool, combo_t* result) {
 }
 
 /* NOT true */
-bool_t straight_flush(card_t** pool, combo_t* result) {
-  if (flush(pool, result)) {
-    if (straight(pool, result)) {
+bool_t straight_flush(card_t** pool, combo_t* result, byte_t size) {
+  if (flush(pool, result, size)) {
+    if (straight(pool, result, size)) {
       result->kind = STRAIGHTF;
       return TRUE;
     }
@@ -161,17 +173,19 @@ bool_t straight_flush(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t three_of_a_kind(card_t** pool, combo_t* result) {
+bool_t three_of_a_kind(card_t** pool, combo_t* result, byte_t size) {
   byte_t reps[POOL_SIZE];
   counter_t i, j;
 
-  fill_reps(pool, reps);
+  if (size < 3) return FALSE;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  fill_reps(pool, reps, size);
+
+  for (i = 0; i < size; ++i) {
     if (reps[i] == 3) {
       result->kind = THREE;
       result->rank[0] = pool[i];
-      for (j = 0; j < POOL_SIZE; j++) {
+      for (j = 0; j < size; j++) {
         if (reps[j] != 3) {
           if (!result->kickers[0]) result->kickers[0] = pool[j]; else
             if (!result->kickers[1]) result->kickers[1] = pool[j]; else
@@ -184,14 +198,16 @@ bool_t three_of_a_kind(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t pairs(card_t** pool, combo_t* result) {
+bool_t pairs(card_t** pool, combo_t* result, byte_t size) {
   byte_t reps[POOL_SIZE];
   counter_t i, j;
   card_t* first = NULL;
 
-  fill_reps(pool, reps);
+  if (size < 4) return FALSE;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  fill_reps(pool, reps, size);
+
+  for (i = 0; i < size; ++i) {
     if (reps[i] == 2) {
       if (!first) {
         first = pool[i];
@@ -200,7 +216,7 @@ bool_t pairs(card_t** pool, combo_t* result) {
           result->kind = PAIRS;
           result->rank[0] = first;
           result->rank[1] = pool[i];
-          for (j = 0; j < POOL_SIZE; j++) {
+          for (j = 0; j < size; j++) {
             if (   (reps[j] != 2)  ||
                  ( (reps[j] == 2)
                   && ((*pool[j])[RANK] != (*pool[i])[RANK])
@@ -218,17 +234,19 @@ bool_t pairs(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-bool_t pair(card_t** pool, combo_t* result) {
+bool_t pair(card_t** pool, combo_t* result, byte_t size) {
   byte_t reps[POOL_SIZE];
   counter_t i, j;
 
-  fill_reps(pool, reps);
+  if (size < 2) return FALSE;
 
-  for (i = 0; i < POOL_SIZE; ++i) {
+  fill_reps(pool, reps, size);
+
+  for (i = 0; i < size; ++i) {
     if (reps[i] == 2) {
       result->kind = PAIR;
       result->rank[0] = pool[i];
-      for (j = 0; j < POOL_SIZE; j++) {
+      for (j = 0; j < size; j++) {
         if (reps[j] != 2) {
           if (!result->kickers[0]) result->kickers[0] = pool[j]; else
             if (!result->kickers[1]) result->kickers[1] = pool[j]; else
@@ -242,7 +260,7 @@ bool_t pair(card_t** pool, combo_t* result) {
   return FALSE;
 }
 
-combo_t pok_resolve(card_t** pool) {
+combo_t pok_resolve(card_t** pool, byte_t size) {
   combo_t result;
   int i;
 
@@ -251,28 +269,28 @@ combo_t pok_resolve(card_t** pool) {
   for (i = 0; i < RANK_CARDS_COUNT; ++i)
     result.rank[i] = NULL;
 
-  sort_by_rank(pool);
+  sort_by_rank(pool, size);
 
-  if (straight_flush(pool, &result))
+  if (straight_flush(pool, &result, size))
     return result;
-  if (four_of_a_kind(pool, &result))
+  if (four_of_a_kind(pool, &result, size))
     return result;
-  if (full_house(pool, &result))
+  if (full_house(pool, &result, size))
     return result;
-  if (flush(pool, &result))
+  if (flush(pool, &result, size))
     return result;
-  if (straight(pool, &result))
+  if (straight(pool, &result, size))
     return result;
-  if (three_of_a_kind(pool, &result))
+  if (three_of_a_kind(pool, &result, size))
     return result;
-  if (pairs(pool, &result))
+  if (pairs(pool, &result, size))
     return result;
-  if (pair(pool, &result))
+  if (pair(pool, &result, size))
     return result;
 
   result.kind = HIGHC;
   result.rank[0] = pool[0];
-  for (i = 0; i < KICKERS_COUNT; ++i) {
+  for (i = 0; i < kickers_count(size); ++i) {
     result.kickers[i] = pool[i+1];
   }
 
@@ -283,8 +301,8 @@ card_t** pok_compare(card_t** pool1, card_t** pool2) {
   counter_t i;
   char* rank1, *rank2;
 
-  combo_t result1 = pok_resolve(pool1);
-  combo_t result2 = pok_resolve(pool2);
+  combo_t result1 = pok_resolve(pool1, POOL_SIZE);
+  combo_t result2 = pok_resolve(pool2, POOL_SIZE);
 
   if (result1.kind > result2.kind)
     return pool1;

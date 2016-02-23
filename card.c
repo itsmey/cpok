@@ -56,7 +56,7 @@ combo_t card_resolve(hand_t hand, open_t open) {
   for (i = 0; i < TABLE_SIZE; ++i)
     pool[HAND_SIZE + i] = open[i];
 
-  return pok_resolve(pool);
+  return pok_resolve(pool, POOL_SIZE);
 }
 
 bool_t card_cmp_suits(card_t card1, card_t card2) {

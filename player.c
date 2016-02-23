@@ -88,7 +88,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   char str_combo[255];
 
   player_fill_pool(player, p);
-  card_combo_to_text(str_combo, pok_resolve(p));
+  card_combo_to_text(str_combo, pok_resolve(p, POOL_SIZE));
 
   if (!yet_winner) {
     LOG("yet_winner now is %s\n", yet_winner->name);

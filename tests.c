@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "defs.h"
 #include "card.h"
 #include "pok.h"
 #include "tests.h"
 
-#define CASES_COUNT 5000
+#define CASES_COUNT 1000
 
 static const char* resolve_data[][POOL_SIZE] = {
   {"Qs", "2d", "3s", "Th", "Jc", "7s", "9h"},  /* High card */
@@ -44,11 +45,11 @@ void randomize_pool(card_t** pool, card_t* pool_cards) {
   }
 }
 
-combo_t resolve_pool(card_t** pool) {
+combo_t resolve_pool(card_t** pool, byte_t pool_size) {
   combo_t result;
   char str[255];
 
-  result = pok_resolve(pool);
+  result = pok_resolve(pool, pool_size);
 
   printf(" %s, rank ", card_kind_to_text(result.kind));
   print_pool(result.rank, RANK_CARDS_COUNT);
@@ -69,6 +70,7 @@ void test(void) {
   card_t* pool2[POOL_SIZE];
   card_t** compare_result;
   int i, j;
+  byte_t random_size;
 
   printf("\nresolve tests:\n\n");
 
@@ -78,7 +80,7 @@ void test(void) {
     clear_pool(pool);
     randomize_pool(pool, pool_cards);
     printf("pool: "); print_pool(pool, POOL_SIZE);
-    resolve_pool(pool);
+    resolve_pool(pool, POOL_SIZE);
   }
 
   printf("\npre-defined pools:\n\n");
@@ -89,9 +91,9 @@ void test(void) {
       pool[j] = &pool_cards[j];
     }
     printf("pool: "); print_pool(pool, POOL_SIZE);
-    sort_by_rank(pool);
+    sort_by_rank(pool, POOL_SIZE);
     printf(" sorted: "); print_pool(pool, POOL_SIZE);
-    resolve_pool(pool);
+    resolve_pool(pool, POOL_SIZE);
   }
 
   printf("\ncomparison tests:\n\n");
@@ -100,11 +102,11 @@ void test(void) {
     clear_pool(pool);
     randomize_pool(pool, pool_cards);
     printf("pool1: "); print_pool(pool, POOL_SIZE);
-    resolve_pool(pool);
+    resolve_pool(pool, POOL_SIZE);
     clear_pool(pool2);
     randomize_pool(pool2, pool_cards2);
     printf("pool2: "); print_pool(pool2, POOL_SIZE);
-    resolve_pool(pool2);
+    resolve_pool(pool2, POOL_SIZE);
 
     compare_result = pok_compare(pool, pool2);
     if (compare_result == pool)
@@ -116,6 +118,15 @@ void test(void) {
     }
   }
 
+  printf("\nincomplete pools:\n\n");
+
+  for (i = 0; i < CASES_COUNT; ++i) {
+    random_size = rand() % POOL_SIZE + 1;
+    clear_pool(pool);
+    randomize_pool(pool, pool_cards);
+    printf("pool: "); print_pool(pool, random_size);
+    resolve_pool(pool, random_size);
+  }
 
   /*while(1) {
     clear_pool(pool);
