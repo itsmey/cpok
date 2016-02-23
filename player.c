@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "ai.h"
 
+
 void player_bet(player_t* player, unsigned short amount) {
   player->cash -= amount;
   player->bet += amount;
@@ -30,6 +31,7 @@ void player_raise(player_t* player) {
 
 void player_turn(player_t* player) {
   decision_t decision;
+  counter_t i;
 
   if (player == game_last_player())
     return;
@@ -62,6 +64,22 @@ void player_turn(player_t* player) {
       break;
   }
   player->is_move_made = TRUE;
+  ai_update_behaviour(player, decision, behaviour);
+  FOR_EACH_PLAYER(i) {
+    LOG("%s's statistics: %u %u %u %u %u %u %u %u %u %u %u\n",
+      game.players[i].name,
+      behaviour[i].raises,
+      behaviour[i].bets,
+      behaviour[i].calls,
+      behaviour[i].checks,
+      behaviour[i].folds,
+      behaviour[i].raises_total,
+      behaviour[i].bets_total,
+      behaviour[i].calls_total,
+      behaviour[i].checks_total,
+      behaviour[i].folds_total,
+      behaviour[i].last);
+  }
 }
 
 void player_collect_bank(player_t* player) {
@@ -72,14 +90,26 @@ void player_collect_bank(player_t* player) {
   game.bank = 0;
 }
 
-void player_fill_pool(player_t* player, card_t **pool) {
+byte_t player_fill_pool(player_t* player, card_t **pool) {
   counter_t i;
+  byte_t revealed_cards;
+
+  switch (game.round) {
+    case INIT: revealed_cards = 0; break;
+    case PREFLOP: revealed_cards = 0; break;
+    case FLOP: revealed_cards = 3; break;
+    case TURN: revealed_cards = 4; break;
+    case RIVER: revealed_cards = 5; break;
+    case END: revealed_cards = 0; break;
+  }
 
   pool[0] = &player->pocket[0];
   pool[1] = &player->pocket[1];
 
-  for(i = 0; i < TABLE_SIZE; i++)
-    pool[2+i] = &game.table[i];
+  for(i = 0; i < revealed_cards; i++)
+    pool[HAND_SIZE+i] = &game.table[i];
+
+  return HAND_SIZE + revealed_cards;
 }
 
 player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {

@@ -20,6 +20,11 @@
 #define PLAYERS_COUNT 4
 #define PLAYERS_NAMES {"Shurik", "Coward", "Fool", "Pro"}
 #define PLAYERS_AI {FALSE, FALSE, FALSE, FALSE}
+#define PLAYERS_AI_PARS /* aggr, rnds, bluf, tact */\
+ {{0,  20, 20, 70},  /* Shurik */ \
+  {20, 50, 30, 50},  /* Coward */ \
+  {80, 40, 70, 20},  /* Fool */   \
+  {30, 0,  15, 90}}  /* Pro */
 #define PLAYERS_POSX {15, 50, 85, 50}
 #define PLAYERS_POSY {40, 10, 40, 70}
 
@@ -42,6 +47,8 @@
 #define SMALL_BLIND (BIG_BLIND / 2)
 #define MAX_RAISE  settings.max_bet
 #define AI_DIFF  settings.ai_diff
+
+typedef enum {CHECK, CALL, BET, RAISE, FOLD} decision_t;
 
 #define M_FOLD   "  Fold "
 #define M_CHECK  " Check "

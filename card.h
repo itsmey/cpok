@@ -28,6 +28,7 @@ typedef struct combo_t {
 } combo_t;
 
 bool_t card_validate(const card_t card);
+byte_t card_value(card_t* card);
 void card_fill(card_t card, const char* str);
 void card_random(card_t card);
 void card_random_unique(card_t card, const card_t** pool, const size_t pool_size);

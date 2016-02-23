@@ -2,11 +2,9 @@
 #define GAME_H
 
 #include "defs.h"
-#include "card.h"
 #include "player.h"
 
 typedef enum {INIT, PREFLOP, FLOP, TURN, RIVER, END} round_t;
-typedef enum {CHECK, CALL, BET, RAISE, FOLD} decision_t;
 
 typedef struct game_t {
   card_t table[TABLE_SIZE];

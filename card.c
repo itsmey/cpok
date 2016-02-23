@@ -108,3 +108,9 @@ void card_combo_to_text(char* str, combo_t combo) {
 
   sprintf(str, "%s %s%s", card_kind_to_text(combo.kind), rank_line, kickers_line);
 }
+
+byte_t card_value(card_t* card) {
+  if (card)
+    return strchr(RANKS, (*card)[RANK]) - strchr(RANKS, RANKS[0]);
+  return 0;
+}

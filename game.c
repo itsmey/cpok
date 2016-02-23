@@ -3,9 +3,7 @@
 #include <unistd.h>
 
 #include "defs.h"
-#include "player.h"
 #include "game.h"
-#include "card.h"
 #include "ui.h"
 #include "settings.h"
 
@@ -18,11 +16,17 @@ void game_init() {
   byte_t next;
   const char* players_names[] = PLAYERS_NAMES;
   const bool_t players_ai[] = PLAYERS_AI;
+  byte_t players_ai_pars[][4] = PLAYERS_AI_PARS;
 
   for (i = 0; i < PLAYERS_COUNT; i++) {
     strcpy(game.players[i].name, players_names[i]);
     next = (i == PLAYERS_COUNT - 1) ? 0 : (i % PLAYERS_COUNT) + 1;
     game.players[i].is_ai = players_ai[i];
+    game.players[i].ai.type = AI_DIFF;
+    game.players[i].ai.aggr = players_ai_pars[i][1];
+    game.players[i].ai.rnds = players_ai_pars[i][2];
+    game.players[i].ai.bluf = players_ai_pars[i][3];
+    game.players[i].ai.tact = players_ai_pars[i][4];
     game.players[i].next = &(game.players[next]);
     game.players[i].cash = INITIAL_CASH;
     game.players[i].bet = 0;
@@ -31,6 +35,8 @@ void game_init() {
     game.players[i].is_move_made = FALSE;
     game.players[i].is_tie = FALSE;
   }
+
+  ai_init_behaviour(behaviour);
 
   game.players[rand() % PLAYERS_COUNT].is_dealer = TRUE;
   game.current = NULL;
@@ -76,6 +82,7 @@ void game_round() {
   game.r_number++;
   ui_refresh_msg(M2, "Round %d: pre-flop", game.r_number);
 
+  ai_clear_behaviour(behaviour);
   game_deal();
 
   for (i = 0; i < PLAYERS_COUNT; i++) {

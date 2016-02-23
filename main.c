@@ -3,10 +3,10 @@
 #include <stdlib.h>
 
 #include "defs.h"
+#include "game.h"
 #include "card.h"
 #include "tests.h"
 #include "ui.h"
-#include "game.h"
 
 FILE* log_file;
 

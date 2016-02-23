@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "card.h"
+#include "ai.h"
 
 typedef struct player_t {
   char name[16];
@@ -12,6 +13,7 @@ typedef struct player_t {
   bool_t is_move_made;
   bool_t is_tie;
   card_t pocket[HAND_SIZE];
+  ai_t ai;
   unsigned short cash;
   unsigned short bet;
   struct player_t* next;
@@ -23,7 +25,7 @@ void player_turn(player_t* player);
 void player_collect_bank(player_t* player);
 void player_bank(player_t* player);
 void player_raise(player_t* player);
-void player_fill_pool(player_t* player, card_t **pool);
+byte_t player_fill_pool(player_t* player, card_t **pool);
 player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool);
 
 #endif
