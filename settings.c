@@ -126,8 +126,8 @@ void settings_show() {
 
 void field_label(field_t f, char* buf) {
   switch (f) {
-    case F_SPEED: strcpy(buf, "Game speed"); break;
-    case F_AI_DIFF: strcpy(buf, "AI difficulty"); break;
+    case F_SPEED: strcpy(buf, "Speed"); break;
+    case F_AI_DIFF: strcpy(buf, "AI level"); break;
     case F_CASH: strcpy(buf, "Initial cash"); break;
     case F_BLIND: strcpy(buf, "Big blind"); break;
     case F_BET: strcpy(buf, "Max bet"); break;

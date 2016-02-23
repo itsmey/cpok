@@ -41,6 +41,7 @@
 #define BIG_BLIND settings.blind
 #define SMALL_BLIND (BIG_BLIND / 2)
 #define MAX_RAISE  settings.max_bet
+#define AI_DIFF  settings.ai_diff
 
 #define M_FOLD   "  Fold "
 #define M_CHECK  " Check "

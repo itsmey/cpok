@@ -7,6 +7,7 @@
 #include "ui.h"
 #include "pok.h"
 #include "settings.h"
+#include "ai.h"
 
 void player_bet(player_t* player, unsigned short amount) {
   player->cash -= amount;
@@ -28,38 +29,37 @@ void player_raise(player_t* player) {
 }
 
 void player_turn(player_t* player) {
+  decision_t decision;
 
   if (player == game_last_player())
     return;
 
-  ui_refresh_msg(M1, "%s turns.", player->name);
+  ui_refresh_msg(M1, "%s is thinking...", player->name);
 
-  if (player->is_ai) {
-     /* TODO: AI */
-  } else {
-    switch (ui_selector(player)) {
-      case CHECK:
-        set_msg(M2, "%s: checks.", player->name);
-        break;
-      case BET:
-        set_msg(M2, "%s bets %u", player->name, BIG_BLIND);
-        player_bet(player, BIG_BLIND);
-        break;
-      case RAISE:
-        set_msg(M2, "%s raises to %u", player->name, game.bet * 2);
-        player_raise(player);
-        break;
-      case FOLD:
-        LOG("%s says fold\n", player->name);
-        set_msg(M2, "%s: folds.", player->name);
-        player_bank(player);
-        player->is_in_game = FALSE;
-        break;
-      case CALL:
-        set_msg(M2, "%s calls %u", player->name, game.bet);
-        player_bet(player, game.bet - player->bet);
-        break;
-    }
+  decision = (player->is_ai) ? ai_decision(player) : ui_selector(player);
+
+  switch (decision) {
+    case CHECK:
+      set_msg(M2, "%s: checks.", player->name);
+      break;
+    case BET:
+      set_msg(M2, "%s bets %u", player->name, BIG_BLIND);
+      player_bet(player, BIG_BLIND);
+      break;
+    case RAISE:
+      set_msg(M2, "%s raises to %u", player->name, game.bet * 2);
+      player_raise(player);
+      break;
+    case FOLD:
+      LOG("%s says fold\n", player->name);
+      set_msg(M2, "%s: folds.", player->name);
+      player_bank(player);
+      player->is_in_game = FALSE;
+      break;
+    case CALL:
+      set_msg(M2, "%s calls %u", player->name, game.bet);
+      player_bet(player, game.bet - player->bet);
+      break;
   }
   player->is_move_made = TRUE;
 }
