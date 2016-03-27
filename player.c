@@ -11,6 +11,7 @@
 
 
 void player_bet(player_t* player, unsigned short amount) {
+  amount = (player->cash >= amount) ? amount : player->cash;
   player->cash -= amount;
   player->bet += amount;
   if (game.bet < player->bet)
@@ -31,41 +32,48 @@ void player_raise(player_t* player) {
 
 void player_turn(player_t* player) {
   decision_t decision;
-  counter_t i;
+  /*counter_t i;*/
 
   if (player == game_last_player())
     return;
 
-  ui_refresh_msg(M1, "%s is thinking...", player->name);
+  if (player->cash <= 0) {
+    /* player have no cash and only watching */
+    ui_refresh_msg(M1, "%s has no cash to turn.", player->name);
+  } else {
+    ui_refresh_msg(M1, "%s is thinking...", player->name);
 
-  decision = (player->is_ai) ? ai_decision(player) : ui_selector(player);
+    decision = (player->is_ai) ? ai_decision(player) : ui_selector(player);
 
-  switch (decision) {
-    case CHECK:
-      set_msg(M2, "%s: checks.", player->name);
-      break;
-    case BET:
-      set_msg(M2, "%s bets %u", player->name, BIG_BLIND);
-      player_bet(player, BIG_BLIND);
-      break;
-    case RAISE:
-      set_msg(M2, "%s raises to %u", player->name, game.bet * 2);
-      player_raise(player);
-      break;
-    case FOLD:
-      LOG("%s says fold\n", player->name);
-      set_msg(M2, "%s: folds.", player->name);
-      player_bank(player);
-      player->is_in_game = FALSE;
-      break;
-    case CALL:
-      set_msg(M2, "%s calls %u", player->name, game.bet);
-      player_bet(player, game.bet - player->bet);
-      break;
+    switch (decision) {
+      case CHECK:
+        set_msg(M2, "%s: checks.", player->name);
+        break;
+      case BET:
+        set_msg(M2, "%s bets %u", player->name, BIG_BLIND);
+        player_bet(player, BIG_BLIND);
+        break;
+      case RAISE:
+        set_msg(M2, "%s raises to %u", player->name, game.bet * 2);
+        player_raise(player);
+        break;
+      case FOLD:
+        LOG("%s says fold\n", player->name);
+        set_msg(M2, "%s: folds.", player->name);
+        player_bank(player);
+        player->is_in_game = FALSE;
+        break;
+      case CALL:
+        set_msg(M2, "%s calls %u", player->name, game.bet);
+        player_bet(player, game.bet - player->bet);
+        break;
+    }
+
+    ai_update_behaviour(player, decision, behaviour);
   }
+
   player->is_move_made = TRUE;
-  ai_update_behaviour(player, decision, behaviour);
-  FOR_EACH_PLAYER(i) {
+  /*FOR_EACH_PLAYER(i) {
     LOG("%s's statistics: %u %u %u %u %u %u %u %u %u %u %u\n",
       game.players[i].name,
       behaviour[i].raises,
@@ -79,7 +87,7 @@ void player_turn(player_t* player) {
       behaviour[i].checks_total,
       behaviour[i].folds_total,
       behaviour[i].last);
-  }
+  }*/
 }
 
 void player_collect_bank(player_t* player) {

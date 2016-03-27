@@ -89,6 +89,7 @@ void game_start() {
   }
 
   ui_refresh_msg(M2, "%s", "Game over!");
+  ui_refresh_msg(M1, "%s", "Press any key to exit.");
   ui_wait_any_key();
 
   ui_destroy();
@@ -108,7 +109,7 @@ void game_round() {
 
   for (i = 0; i < PLAYERS_COUNT; i++) {
     game.players[i].bet = 0;
-    game.players[i].is_in_game = TRUE;
+    game.players[i].is_in_game = (game.players[i].cash > 0);
     game.players[i].is_tie = FALSE;
   }
 
@@ -320,11 +321,8 @@ player_t* game_next_current() {
 void game_choose_winner() {
   card_t *pool[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   player_t *yet_winner = NULL;
-  /*player_t *first_player;*/ /* first player who opens cards */
 
   set_msg(M2, "%s", "Revealing cards...");
-
-  /*first_player = game.current;*/
 
   do {
     yet_winner = player_reveal(game.current, yet_winner, pool);
