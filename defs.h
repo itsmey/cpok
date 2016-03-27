@@ -66,8 +66,8 @@ typedef enum {CHECK, CALL, BET, RAISE, FOLD} decision_t;
 #define CP_CARD_DH  5
 
 #define INIT_COLOR_PAIRS {\
-      init_pair(CP_PNAME,    COLOR_WHITE, COLOR_CYAN); \
-      init_pair(CP_PCURRENT, COLOR_WHITE, COLOR_BLUE); \
+      init_pair(CP_PNAME,    COLOR_WHITE, COLOR_YELLOW); \
+      init_pair(CP_PCURRENT, COLOR_WHITE, COLOR_MAGENTA); \
       init_pair(CP_LABEL,    COLOR_BLACK, COLOR_WHITE);\
       init_pair(CP_CARD_CS,  COLOR_WHITE, COLOR_GREEN);\
       init_pair(CP_CARD_DH,  COLOR_WHITE, COLOR_RED);} \
