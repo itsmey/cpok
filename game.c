@@ -11,6 +11,26 @@ game_t game;
 card_t* global_pool[GLOBAL_POOL_SIZE];
 card_t* pool[POOL_SIZE];
 
+/* for testing purposes */
+/* dealing special set of cards to test tie conditions */
+void tie_test1() {
+  game_deal_specific(
+    "Ac", "Ah",                    /* player 0 */
+    "Kh", "Kc",                    /* player 1 */
+    "Kd", "Ks",                    /* player 2 */
+    "Ad", "As",                    /* player 3 */
+    "2c", "2s", "2h", "3d", "3s"); /* table */
+}
+
+void tie_test2() {
+  game_deal_specific(
+    "2c", "3c",                    /* player 0 */
+    "2h", "3h",                    /* player 1 */
+    "2d", "3d",                    /* player 2 */
+    "2s", "3s",                    /* player 3 */
+    "Ac", "As", "Ah", "Ad", "Ks"); /* table */
+}
+
 void game_init() {
   counter_t i;
   byte_t next;
@@ -83,9 +103,8 @@ void game_round() {
   ui_refresh_msg(M2, "Round %d: pre-flop", game.r_number);
 
   ai_clear_behaviour(behaviour);
-  /*game_deal();*/
-  game_deal_specific(
-    "2c", "3c", "2h", "3h", "2h", "3h", "2s", "3s", "Ac", "As", "Ah", "Ad", "Kd");
+  game_deal();
+  /* tie_test2(); */   /* use this instead of game_deal() to test tie conditions */
 
   for (i = 0; i < PLAYERS_COUNT; i++) {
     game.players[i].bet = 0;
@@ -301,13 +320,16 @@ player_t* game_next_current() {
 void game_choose_winner() {
   card_t *pool[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   player_t *yet_winner = NULL;
+  /*player_t *first_player;*/ /* first player who opens cards */
 
   set_msg(M2, "%s", "Revealing cards...");
 
-  while (!game_last_player()) {
+  /*first_player = game.current;*/
+
+  do {
     yet_winner = player_reveal(game.current, yet_winner, pool);
     game_next_current();
-  }
+  } while ( !game_last_player() && !game_tie_condition() );
 
   if (!game_declare_tie()) {
     game_declare_winner();
@@ -315,7 +337,38 @@ void game_choose_winner() {
 }
 
 bool_t game_declare_tie() {
-  return FALSE;
+  counter_t i, msgs;
+  counter_t ties;
+  unsigned short part_size;
+  char header[255];
+  char msg[4][W_INFO_WIDTH-2];
+
+  ties = 0;
+
+  FOR_EACH_PLAYER(i)
+    if (game.players[i].is_tie) ties++;
+
+  LOG("ties %d\n", ties);
+
+  if (!ties) return FALSE;
+
+  part_size = game.bank / ties;
+
+  game_collect_bank();
+  sprintf(header, "[ Round %u summary ]", game.r_number);
+
+  msgs = 0;
+
+  FOR_EACH_PLAYER(i) {
+    if (game.players[i].is_tie) {
+      sprintf(msg[msgs++], "%s collects part of %u.", game.players[i].name, part_size);
+      player_collect_part(&game.players[i], part_size);
+    }
+  }
+
+  ui_info_window(header, msg[0], ties);
+
+  return TRUE;
 }
 
 void game_declare_winner() {
@@ -328,6 +381,19 @@ void game_declare_winner() {
   sprintf(msg[0], "%s collects bank of %u.", last->name, game.bank);
   ui_info_window(header, msg[0], 1);
   player_collect_bank(last);
+}
+
+bool_t game_tie_condition() {
+  counter_t i;
+
+  FOR_EACH_PLAYER(i) {
+    if (game.players[i].is_in_game) {
+      if (!game.players[i].is_tie)
+        return FALSE;
+    }
+  }
+
+  return TRUE;
 }
 
 void game_deal_specific(const char* player0card1,

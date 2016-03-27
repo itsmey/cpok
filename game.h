@@ -32,6 +32,7 @@ player_t* game_get_dealer();
 void game_change_dealer();
 void game_next_part();
 bool_t game_equal_bets_condition();
+bool_t game_tie_condition();
 player_t* game_last_player();
 player_t* game_next_current();
 void game_collect_bank();

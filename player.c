@@ -90,6 +90,14 @@ void player_collect_bank(player_t* player) {
   game.bank = 0;
 }
 
+void player_collect_part(player_t* player, unsigned short part) {
+  LOG("%s collects part of %u\n", player->name, part);
+  set_msg(M2, "%s collects part of %u\n", player->name, game.bank);
+  game_collect_bank();
+  player->cash += part;
+  game.bank -= part;
+}
+
 byte_t player_fill_pool(player_t* player, card_t **pool) {
   counter_t i;
   byte_t revealed_cards;
@@ -121,7 +129,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   card_combo_to_text(str_combo, pok_resolve(p, POOL_SIZE));
 
   if (!yet_winner) {
-    LOG("yet_winner now is %s\n", yet_winner->name);
+    LOG("yet_winner now is %s\n", player->name);
     for(i = 0; i < POOL_SIZE; i++)
       pool[i] = p[i];
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
@@ -143,6 +151,15 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   if (pok_compare(pool, p) == p) {
     /* we win (for now) */
     yet_winner->is_in_game = FALSE;
+
+    /* clear previous ties */
+    FOR_EACH_PLAYER(i) {
+      if (game.players[i].is_tie) {
+        game.players[i].is_in_game = FALSE;
+        game.players[i].is_tie = FALSE;
+      }
+    }
+
     LOG("%s lefts the game\n", yet_winner->name);
     yet_winner = player;
     for(i = 0; i < POOL_SIZE; i++)
@@ -156,6 +173,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   if (pok_compare(pool, p) == NULL) {
     /* we tie */
     player->is_tie = TRUE;
+    yet_winner->is_tie = TRUE;
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
     ui_refresh();
     ui_wait_any_key();
