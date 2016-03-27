@@ -39,4 +39,19 @@ void game_choose_winner();
 bool_t game_declare_tie();
 void game_declare_winner();
 
+/* for test purposes */
+void game_deal_specific(const char* player0card1,
+                        const char* player0card2,
+                        const char* player1card1,
+                        const char* player1card2,
+                        const char* player2card1,
+                        const char* player2card2,
+                        const char* player3card1,
+                        const char* player3card2,
+                        const char* tablecard1,
+                        const char* tablecard2,
+                        const char* tablecard3,
+                        const char* tablecard4,
+                        const char* tablecard5);
+
 #endif

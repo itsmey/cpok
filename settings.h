@@ -37,5 +37,4 @@ void field_label(field_t f, char* buf);
 void field_value(field_t f, char* buf);
 void field_update(field_t f, int sign);
 
-
 #endif

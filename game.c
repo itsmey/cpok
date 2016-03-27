@@ -83,7 +83,9 @@ void game_round() {
   ui_refresh_msg(M2, "Round %d: pre-flop", game.r_number);
 
   ai_clear_behaviour(behaviour);
-  game_deal();
+  /*game_deal();*/
+  game_deal_specific(
+    "2c", "3c", "2h", "3h", "2h", "3h", "2s", "3s", "Ac", "As", "Ah", "Ad", "Kd");
 
   for (i = 0; i < PLAYERS_COUNT; i++) {
     game.players[i].bet = 0;
@@ -326,4 +328,42 @@ void game_declare_winner() {
   sprintf(msg[0], "%s collects bank of %u.", last->name, game.bank);
   ui_info_window(header, msg[0], 1);
   player_collect_bank(last);
+}
+
+void game_deal_specific(const char* player0card1,
+                        const char* player0card2,
+                        const char* player1card1,
+                        const char* player1card2,
+                        const char* player2card1,
+                        const char* player2card2,
+                        const char* player3card1,
+                        const char* player3card2,
+                        const char* tablecard1,
+                        const char* tablecard2,
+                        const char* tablecard3,
+                        const char* tablecard4,
+                        const char* tablecard5) {
+  card_t card;
+
+  LOG("%s\n", "dealing cards");
+
+  #define COPY(str, to)   \
+    card_fill(card, str); \
+    card_copy(card, to);
+
+  COPY(player0card1, game.players[0].pocket[0]);
+  COPY(player0card2, game.players[0].pocket[1]);
+  COPY(player1card1, game.players[1].pocket[0]);
+  COPY(player1card2, game.players[1].pocket[1]);
+  COPY(player2card1, game.players[2].pocket[0]);
+  COPY(player2card2, game.players[2].pocket[1]);
+  COPY(player3card1, game.players[3].pocket[0]);
+  COPY(player3card2, game.players[3].pocket[1]);
+  COPY(tablecard1, game.table[0]);
+  COPY(tablecard2, game.table[1]);
+  COPY(tablecard3, game.table[2]);
+  COPY(tablecard4, game.table[3]);
+  COPY(tablecard5, game.table[4]);
+
+  #undef COPY
 }
