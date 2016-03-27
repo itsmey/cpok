@@ -54,6 +54,7 @@ void game_init() {
     game.players[i].is_dealer = FALSE;
     game.players[i].is_move_made = FALSE;
     game.players[i].is_tie = FALSE;
+    game.players[i].is_cards_opened = FALSE;
   }
 
   ai_init_behaviour(behaviour);
@@ -111,6 +112,7 @@ void game_round() {
     game.players[i].bet = 0;
     game.players[i].is_in_game = (game.players[i].cash > 0);
     game.players[i].is_tie = FALSE;
+    game.players[i].is_cards_opened = FALSE;
   }
 
   LOG("%s\n", "PREFLOP");

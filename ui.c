@@ -26,16 +26,28 @@ void print_msg(char* msg, int n_line) {
   mvprintw(y, 2, "%s", msg);
 }
 
-void print_card(int y, int x, card_t card) {
+void print_card(int y, int x, card_t card, bool_t opened) {
   char buf[255];
   int color_pair;
+  bool_t open_flag;
 
-  color_pair = ((card[SUIT] == 'd') || (card[SUIT] == 'h')) ?
-    CP_CARD_DH :
-    CP_CARD_CS;
+  #ifdef OPENCARDS
+    open_flag = TRUE;
+  #else
+    open_flag = FALSE;
+  #endif
 
-  PRINT_ATTR(A_BOLD | COLOR_PAIR(color_pair),
-      y, x, "%c%c", card[RANK], card[SUIT]);
+  if (!opened && !open_flag) {
+    color_pair = CP_CARD_HIDDEN;
+    PRINT_ATTR(A_BOLD | COLOR_PAIR(color_pair), y, x, "%s", "  ");
+  } else {
+    color_pair = ((card[SUIT] == 'd') || (card[SUIT] == 'h')) ?
+      CP_CARD_DH :
+      CP_CARD_CS;
+
+    PRINT_ATTR(A_BOLD | COLOR_PAIR(color_pair),
+        y, x, "%c%c", card[RANK], card[SUIT]);
+  }
 }
 
 void print_obscene(int y, int x) {
@@ -94,6 +106,7 @@ void ui_refresh() {
   counter_t i;
   byte_t revealed_cards;
   byte_t cor;  /* center correction */
+  bool_t cards_opened;
 
   const int players_x[] = PLAYERS_POSX;
   const int players_y[] = PLAYERS_POSY;
@@ -113,10 +126,11 @@ void ui_refresh() {
     x = max_x * players_x[i] / 100;
     print_player_name(y, x, &(game.players[i]));
     PRINT(y+1, x, " [ %u ]", game.players[i].cash);
+    cards_opened = game.players[i].is_cards_opened || !game.players[i].is_ai;
     if (game.players[i].is_in_game) {
       PRINT(y+2, x, "%s", "-------");
-      print_card(y+3, x-1, game.players[i].pocket[0]);
-      print_card(y+3, x+2, game.players[i].pocket[1]);
+      print_card(y+3, x-1, game.players[i].pocket[0], cards_opened);
+      print_card(y+3, x+2, game.players[i].pocket[1], cards_opened);
       if (game.players[i].bet)
         PRINT(y+4, x, "bet: %u", game.players[i].bet);
     }
@@ -135,7 +149,7 @@ void ui_refresh() {
   }
   cor = 3 * revealed_cards / 2 - 1;
   for (i = 0; i < revealed_cards; i++)
-    print_card(y+1, x-cor+3*i, game.table[i]);
+    print_card(y+1, x-cor+3*i, game.table[i], TRUE);
   PRINT(y+2, x, "bank: %u", game.bank);
 
   print_panel(x, y);

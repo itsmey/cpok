@@ -141,6 +141,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
     for(i = 0; i < POOL_SIZE; i++)
       pool[i] = p[i];
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    player->is_cards_opened = TRUE;
     ui_refresh();
     ui_wait_any_key();
     return player;
@@ -173,6 +174,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
     for(i = 0; i < POOL_SIZE; i++)
       pool[i] = p[i];
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    player->is_cards_opened = TRUE;
     ui_refresh();
     ui_wait_any_key();
     return player;
@@ -183,6 +185,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
     player->is_tie = TRUE;
     yet_winner->is_tie = TRUE;
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
+    player->is_cards_opened = TRUE;
     ui_refresh();
     ui_wait_any_key();
     return yet_winner;

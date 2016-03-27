@@ -64,13 +64,15 @@ typedef enum {CHECK, CALL, BET, RAISE, FOLD} decision_t;
 #define CP_LABEL    3
 #define CP_CARD_CS  4
 #define CP_CARD_DH  5
+#define CP_CARD_HIDDEN 6
 
 #define INIT_COLOR_PAIRS {\
       init_pair(CP_PNAME,    COLOR_WHITE, COLOR_YELLOW); \
       init_pair(CP_PCURRENT, COLOR_WHITE, COLOR_MAGENTA); \
       init_pair(CP_LABEL,    COLOR_BLACK, COLOR_WHITE);\
       init_pair(CP_CARD_CS,  COLOR_WHITE, COLOR_GREEN);\
-      init_pair(CP_CARD_DH,  COLOR_WHITE, COLOR_RED);} \
+      init_pair(CP_CARD_DH,  COLOR_WHITE, COLOR_RED);\
+      init_pair(CP_CARD_HIDDEN,  COLOR_WHITE, COLOR_CYAN);}
 
 #define FOR_EACH_PLAYER(i) for (i = 0; i < PLAYERS_COUNT; i++)
 

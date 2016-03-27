@@ -12,6 +12,7 @@ typedef struct player_t {
   bool_t is_in_game;
   bool_t is_move_made;
   bool_t is_tie;
+  bool_t is_cards_opened;
   card_t pocket[HAND_SIZE];
   ai_t ai;
   unsigned short cash;
