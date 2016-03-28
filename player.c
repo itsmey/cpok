@@ -32,7 +32,6 @@ void player_raise(player_t* player) {
 
 void player_turn(player_t* player) {
   decision_t decision;
-  /*counter_t i;*/
 
   if (player == game_last_player())
     return;
@@ -40,9 +39,12 @@ void player_turn(player_t* player) {
   if (player->cash <= 0) {
     /* player have no cash and only watching */
     ui_refresh_msg(M1, "%s has no cash to turn.", player->name);
-    ui_sleep(1);
+    ui_sleep(game.sleep_time);
   } else {
     ui_refresh_msg(M1, "%s is thinking...", player->name);
+
+    if (player->is_ai)
+      ui_sleep(game.sleep_time);
 
     decision = (player->is_ai) ? ai_decision(player) : ui_selector(player);
 

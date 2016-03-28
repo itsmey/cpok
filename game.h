@@ -15,6 +15,7 @@ typedef struct game_t {
   player_t players[PLAYERS_COUNT];
   player_t* current;
   round_t round;
+  byte_t sleep_time;
   char msg[2][255];
 } game_t;
 

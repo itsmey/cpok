@@ -5,6 +5,7 @@
 #include "player.h"
 
 #define set_msg(Pos, F, ...) {\
+  LOG("set_msg%u\n", Pos);\
   sprintf(game.msg[Pos], F, __VA_ARGS__);}
 
 #define ui_refresh_msg(Pos, F, ...) {\
@@ -14,6 +15,7 @@
 void ui_init();
 void ui_destroy();
 void ui_refresh();
+void ui_refresh_sleep(unsigned int seconds);
 decision_t ui_selector(player_t* player);
 void ui_sleep(unsigned int seconds);
 void ui_info_window(char* header, char* first_line, byte_t n_lines);

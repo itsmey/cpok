@@ -40,7 +40,7 @@
 #define BIG_BLIND_DEF 10
 #define MAX_RAISE_DEF 160
 #define AI_DIFF_DEF DUMB
-#define SPEED_DEF SLOW
+#define SPEED_DEF FASTER
 
 #define INITIAL_CASH settings.cash
 #define BIG_BLIND settings.blind

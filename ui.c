@@ -108,6 +108,8 @@ void ui_refresh() {
   byte_t cor;  /* center correction */
   bool_t cards_opened;
 
+  LOG("refresh%s\n", "");
+
   const int players_x[] = PLAYERS_POSX;
   const int players_y[] = PLAYERS_POSY;
   int max_y, max_x;
@@ -246,6 +248,12 @@ decision_t decode_choice(char* choice) {
 }
 
 void ui_sleep(unsigned int seconds) {
+  refresh();
+  sleep(seconds);
+}
+
+void ui_refresh_sleep(unsigned int seconds) {
+  ui_refresh();
   refresh();
   sleep(seconds);
 }

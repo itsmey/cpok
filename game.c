@@ -69,6 +69,12 @@ void game_init() {
 
   game.r_number = 0;
 
+  switch (settings.speed) {
+    case SLOW: game.sleep_time = 3; break;
+    case FASTER: game.sleep_time = 2; break;
+    case FAST: game.sleep_time = 1; break;
+  }
+
   set_msg(0, "%s", "");
   set_msg(1, "%s", "");
 }
@@ -224,7 +230,7 @@ void game_blinds() {
   LOG("new current is %s\n", game.current->name);
 
   ui_refresh_msg(M1, "%s", "Paying blinds...");
-  ui_sleep(1);
+  ui_sleep(game.sleep_time);
 }
 
 void game_change_dealer() {
@@ -247,6 +253,7 @@ void game_next_part() {
   player_t* dealer = game_get_dealer();
 
   if (game_last_player()) {
+    ui_refresh_sleep(0);
     game_declare_winner();
     game.round = END;
     return;
@@ -258,19 +265,19 @@ void game_next_part() {
     case PREFLOP:
       game_collect_bank();
       LOG("%s\n", "changing round to FLOP");
-      set_msg(M2, "Round %d: flop", game.r_number);
+      /*set_msg(M2, "Round %d: flop", game.r_number);*/
       game.round = FLOP;
       break;
     case FLOP:
       game_collect_bank();
       LOG("%s\n", "changing round to TURN");
-      set_msg(M2, "Round %d: turn", game.r_number);
+      /*set_msg(M2, "Round %d: turn", game.r_number);*/
       game.round = TURN;
       break;
     case TURN:
       game_collect_bank();
       LOG("%s\n", "changing round to RIVER");
-      set_msg(M2, "Round %d: river", game.r_number);
+      /*set_msg(M2, "Round %d: river", game.r_number);*/
       game.round = RIVER;
       break;
     case RIVER:
