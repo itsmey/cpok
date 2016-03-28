@@ -1,7 +1,7 @@
 TARGET = cpok
 LIBS = -lncurses
 CC = gcc
-CFLAGS = -g -ansi -Wall -Werror -DLOGGING -DOPENCARDS
+CFLAGS = -g -ansi -Wall -Werror -DLOGGING
 
 .PHONY: default all clean
 

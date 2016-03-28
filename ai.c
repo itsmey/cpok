@@ -43,8 +43,8 @@ decision_t ai_decision_dumb(player_t *player) {
     decision = can_raise(player) ? RAISE : (can_bet(player) ? BET : CALL);
   }
 
-  /*ui_sleep(1);*/
-  ui_wait_any_key();
+  ui_sleep(2);
+  /*ui_wait_any_key();*/
   return decision;
 }
 

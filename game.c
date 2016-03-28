@@ -165,7 +165,6 @@ bool_t game_equal_bets_condition() {
 
 void game_deal() {
   counter_t i;
-  /*card_t card;*/
   card_t pool_cards[GLOBAL_POOL_SIZE];
   card_t* pool[GLOBAL_POOL_SIZE];
 
