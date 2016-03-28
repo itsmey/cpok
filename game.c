@@ -165,21 +165,25 @@ bool_t game_equal_bets_condition() {
 
 void game_deal() {
   counter_t i;
-  card_t card;
-  card_t** pool[GLOBAL_POOL_SIZE];
+  /*card_t card;*/
+  card_t pool_cards[GLOBAL_POOL_SIZE];
+  card_t* pool[GLOBAL_POOL_SIZE];
 
   LOG("%s\n", "dealing cards");
 
   for (i = 0; i < GLOBAL_POOL_SIZE; ++i)
     pool[i] = NULL;
 
+  for (i = 0; i < GLOBAL_POOL_SIZE; ++i) {
+    card_random_unique(pool_cards[i], (const card_t**)pool, GLOBAL_POOL_SIZE);
+    pool[i] = &pool_cards[i];
+  }
+
   for (i = 0; i < TABLE_SIZE; i++) {
-    card_random_unique(card, (const card_t**)pool, GLOBAL_POOL_SIZE);
-    card_copy(card, game.table[i]);
+    card_copy(pool_cards[i], game.table[i]);
   }
   for (i = 0; i < GLOBAL_POOL_SIZE - TABLE_SIZE; i++) {
-    card_random_unique(card, (const card_t**)pool, GLOBAL_POOL_SIZE);
-    card_copy(card, game.players[i / 2].pocket[i % 2]);
+    card_copy(pool_cards[TABLE_SIZE + i], game.players[i / 2].pocket[i % 2]);
   }
 }
 
