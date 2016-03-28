@@ -40,6 +40,7 @@ void player_turn(player_t* player) {
   if (player->cash <= 0) {
     /* player have no cash and only watching */
     ui_refresh_msg(M1, "%s has no cash to turn.", player->name);
+    ui_sleep(1);
   } else {
     ui_refresh_msg(M1, "%s is thinking...", player->name);
 
@@ -192,4 +193,20 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   }
 
   return NULL;  /* unreachable */
+}
+
+bool_t can_bet(player_t* player) {
+  return ((player->bet == 0) && (game.bet == 0));
+}
+
+bool_t can_call(player_t* player) {
+  return (player->bet < game.bet);
+}
+
+bool_t can_check(player_t* player) {
+  return (player->bet == game.bet);
+}
+
+bool_t can_raise(player_t* player) {
+  return (game.bet != 0);
 }

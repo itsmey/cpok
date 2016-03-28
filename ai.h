@@ -43,7 +43,7 @@ decision_t ai_decision(player_t *player);
 decision_t ai_decision_dumb(player_t *player);
 /*decision_t ai_decision_smarter(player_t *player);*/
 
-unsigned short ai_strength(combo_t combo);
+unsigned short ai_strength(player_t *player);
 void ai_update_behaviour(player_t *p, decision_t d, behaviour_t *b);
 void ai_clear_behaviour(behaviour_t *b);
 void ai_init_behaviour(behaviour_t *b);

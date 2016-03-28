@@ -30,4 +30,9 @@ void player_raise(player_t* player);
 byte_t player_fill_pool(player_t* player, card_t **pool);
 player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool);
 
+bool_t can_bet(player_t* player);
+bool_t can_call(player_t* player);
+bool_t can_check(player_t* player);
+bool_t can_raise(player_t* player);
+
 #endif

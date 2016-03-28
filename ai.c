@@ -1,4 +1,7 @@
+#include <stdlib.h>
+
 #include "ai.h"
+#include "ai_data.h"
 #include "ui.h"
 #include "pok.h"
 
@@ -6,13 +9,8 @@ behaviour_t behaviour[PLAYERS_COUNT];
 
 decision_t ai_decision(player_t *player) {
   decision_t d;
-  card_t *p[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-  byte_t size;
-  combo_t combo;
 
-  size = player_fill_pool(player, p);
-  combo = pok_resolve(p, size);
-  player->ai.strength = ai_strength(combo);
+  player->ai.strength = ai_strength(player);
 
   switch (AI_DIFF) {
     case DUMB: d = ai_decision_dumb(player); break;
@@ -23,22 +21,66 @@ decision_t ai_decision(player_t *player) {
 }
 
 decision_t ai_decision_dumb(player_t *player) {
+  byte_t mark1, mark2, indicator;
+  decision_t decision;
+
   LOG("Player %s strength = %u\n", player->name, player->ai.strength);
   LOG("Player %s aggr = %u\n", player->name, player->ai.aggr);
 
+  mark1 = 100 - player->ai.strength;
+  mark2 = mark1 + player->ai.strength * (100 - player->ai.aggr) / 100;
+
+  indicator = rand() % 100 + 1;  /* 1..100 */
+
+  LOG("mark1 %u mark2 %u indicator %u\n", mark1, mark2, indicator);
+
+  if (indicator < mark1) {
+    decision = can_check(player) ? CHECK : FOLD;
+  } else
+  if (indicator < mark2) {
+    decision = can_bet(player) ? BET : CALL;
+  } else {
+    decision = can_raise(player) ? RAISE : (can_bet(player) ? BET : CALL);
+  }
+
   /*ui_sleep(1);*/
   ui_wait_any_key();
-  return FOLD;
+  return decision;
 }
 
-unsigned short ai_strength(combo_t combo) {
-  unsigned short base, rank;
-  base = (byte_t)combo.kind * 100;
-  rank =
-    card_value(combo.rank[0]) +
-    card_value(combo.rank[1]) +
-    card_value(combo.kickers[0]);
-  return base + rank;
+unsigned short ai_strength(player_t *player) {
+  byte_t strength, value1, value2;
+  short diff;
+  card_t *p[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+  byte_t size;
+  combo_t combo;
+
+  LOG("Calculating strength for player %s\n", player->name);
+
+  if (game.round == PREFLOP) {
+    LOG("Preflop%s\n", "");
+    value1 = card_value(&player->pocket[0]);
+    value2 = card_value(&player->pocket[1]);
+    strength = preflop_strength[value1][value2];
+    LOG("base strength is %u\n", strength);
+    if (player->pocket[0][SUIT] == player->pocket[1][SUIT]) {
+      LOG("bonus for equal suits%s\n", "");
+      strength += 10;
+    }
+    diff = value1 - value2;
+    if ((diff == 1) || (diff == -1)) {
+      LOG("bonus for adjacency%s\n", "");
+      strength += 5;
+    }
+  } else {
+    size = player_fill_pool(player, p);
+    combo = pok_resolve(p, size);
+
+    strength = combo_strength[(byte_t)combo.kind][(byte_t)game.round - 2];
+    LOG("base strength is %u\n", strength);
+  }
+
+  return (strength > 100) ? 100 : strength;
 }
 
 void ai_init_behaviour(behaviour_t *b) {

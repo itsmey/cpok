@@ -9,7 +9,7 @@ default: $(TARGET)
 all: default
 
 OBJECTS = main.o card.o tests.o pok.o player.o game.o ui.o settings.o ai.o
-HEADERS = defs.h card.h tests.h pok.h player.h game.h ui.h settings.h ai.h obscene.h
+HEADERS = defs.h card.h tests.h pok.h player.h game.h ui.h settings.h ai.h ai_data.h obscene.h
 
 %.o: %.c $(HEADERS)
 		$(CC) $(CFLAGS) -c $< -o $@

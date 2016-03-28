@@ -200,19 +200,19 @@ byte_t fill_choices(char** choices, player_t* player, size_t size) {
   i = 0;
   choices[i] = M_FOLD;
   i++;
-  if (player->bet == game.bet) {
+  if (can_check(player)) {
     choices[i] = M_CHECK;
     i++;
   }
-  if (player->bet < game.bet) {
+  if (can_call(player)) {
     choices[i] = M_CALL;
     i++;
   }
-  if ((player->bet == 0) && (game.bet == 0)) {
+  if (can_bet(player)) {
     choices[i] = M_BET;
     i++;
   }
-  if (game.bet != 0) {
+  if (can_raise(player)) {
     choices[i] = M_RAISE;
     i++;
   }

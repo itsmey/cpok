@@ -43,10 +43,10 @@ void game_init() {
     next = (i == PLAYERS_COUNT - 1) ? 0 : (i % PLAYERS_COUNT) + 1;
     game.players[i].is_ai = players_ai[i];
     game.players[i].ai.type = AI_DIFF;
-    game.players[i].ai.aggr = players_ai_pars[i][1];
-    game.players[i].ai.rnds = players_ai_pars[i][2];
-    game.players[i].ai.bluf = players_ai_pars[i][3];
-    game.players[i].ai.tact = players_ai_pars[i][4];
+    game.players[i].ai.aggr = players_ai_pars[i][0];
+    game.players[i].ai.rnds = players_ai_pars[i][1];
+    game.players[i].ai.bluf = players_ai_pars[i][2];
+    game.players[i].ai.tact = players_ai_pars[i][3];
     game.players[i].next = &(game.players[next]);
     game.players[i].cash = INITIAL_CASH;
     game.players[i].bet = 0;

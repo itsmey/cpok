@@ -19,7 +19,7 @@
 
 #define PLAYERS_COUNT 4
 #define PLAYERS_NAMES {"Shurik", "Coward", "Fool", "Pro"}
-#define PLAYERS_AI {FALSE, FALSE, FALSE, FALSE}
+#define PLAYERS_AI {FALSE, TRUE, TRUE, TRUE}
 #define PLAYERS_AI_PARS /* aggr, rnds, bluf, tact */\
  {{0,  20, 20, 70},  /* Shurik */ \
   {20, 50, 30, 50},  /* Coward */ \
