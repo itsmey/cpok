@@ -194,17 +194,31 @@ player_t* game_get_dealer() {
 
 void game_blinds() {
   player_t* dealer = game_get_dealer();
+  player_t *small_blind_payer, *big_blind_payer;
 
   LOG("paying blinds, dealer is %s\n", dealer->name);
 
-  LOG("%s small blind\n", dealer->next->name);
-  player_bet(dealer->next, SMALL_BLIND);
-  LOG("%s big blind\n", dealer->next->next->name);
-  player_bet(dealer->next->next, BIG_BLIND);
+  small_blind_payer = dealer->next;
+  while (!small_blind_payer->is_in_game) {
+    small_blind_payer = small_blind_payer->next;
+  }
+  LOG("%s small blind\n", small_blind_payer->name);
+  player_bet(small_blind_payer, SMALL_BLIND);
+
+  big_blind_payer = small_blind_payer->next;
+  while (!big_blind_payer->is_in_game) {
+    big_blind_payer = big_blind_payer->next;
+  }
+  LOG("%s big blind\n", big_blind_payer->name);
+  player_bet(big_blind_payer, BIG_BLIND);
 
   game.bet = BIG_BLIND;
-  game.current = dealer->next->next->next;
-  LOG("new current is %s\n", dealer->next->next->next->name);
+
+  game.current = big_blind_payer->next;
+  while (!game.current->is_in_game) {
+    game.current = game.current->next;
+  }
+  LOG("new current is %s\n", game.current->name);
 
   ui_refresh_msg(M1, "%s", "Paying blinds...");
   ui_sleep(1);
@@ -273,6 +287,9 @@ void game_next_part() {
   game.bet = 0;
 
   game.current = dealer->next;
+  while (!game.current->is_in_game) {
+    game.current = game.current->next;
+  }
 }
 
 void game_collect_bank() {
