@@ -14,7 +14,7 @@ decision_t ai_decision(player_t *player) {
 
   switch (AI_DIFF) {
     case DUMB: d = ai_decision_dumb(player); break;
-    case SMARTER: d = ai_decision_dumb(player); break;
+    case SMARTER: d = ai_decision_dumb(player); break; /* TODO: smarter AI */
   }
 
   return d;

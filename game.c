@@ -8,8 +8,6 @@
 #include "settings.h"
 
 game_t game;
-card_t* global_pool[GLOBAL_POOL_SIZE];
-card_t* pool[POOL_SIZE];
 
 /* for testing purposes */
 /* dealing special set of cards to test tie conditions */
@@ -36,7 +34,7 @@ void game_init() {
   byte_t next;
   const char* players_names[] = PLAYERS_NAMES;
   const bool_t players_ai[] = PLAYERS_AI;
-  byte_t players_ai_pars[][4] = PLAYERS_AI_PARS;
+  byte_t players_ai_pars[PLAYERS_COUNT][4] = PLAYERS_AI_PARS;
 
   for (i = 0; i < PLAYERS_COUNT; i++) {
     strcpy(game.players[i].name, players_names[i]);
@@ -87,9 +85,9 @@ void game_start() {
   ui_refresh_msg(M1, "%s",
     "You are fucking Shurik. Press any fucking key to start.");
 
-  LOG("%s\n", "initialization done");
-
   ui_wait_any_key();
+
+  LOG("%s\n", "initialization done");
 
   while (!(game_end_condition())) {
     game_round();
@@ -201,32 +199,33 @@ player_t* game_get_dealer() {
   return NULL;
 }
 
+player_t* game_next_in_game_player(player_t* player) {
+  player_t* next = player->next;
+
+  while (!next->is_in_game) {
+    next = next->next;
+  }
+
+  return next;
+}
+
 void game_blinds() {
   player_t* dealer = game_get_dealer();
   player_t *small_blind_payer, *big_blind_payer;
 
   LOG("paying blinds, dealer is %s\n", dealer->name);
 
-  small_blind_payer = dealer->next;
-  while (!small_blind_payer->is_in_game) {
-    small_blind_payer = small_blind_payer->next;
-  }
+  small_blind_payer = game_next_in_game_player(dealer);
   LOG("%s small blind\n", small_blind_payer->name);
   player_bet(small_blind_payer, SMALL_BLIND);
 
-  big_blind_payer = small_blind_payer->next;
-  while (!big_blind_payer->is_in_game) {
-    big_blind_payer = big_blind_payer->next;
-  }
+  big_blind_payer = game_next_in_game_player(small_blind_payer);
   LOG("%s big blind\n", big_blind_payer->name);
   player_bet(big_blind_payer, BIG_BLIND);
 
   game.bet = BIG_BLIND;
 
-  game.current = big_blind_payer->next;
-  while (!game.current->is_in_game) {
-    game.current = game.current->next;
-  }
+  game.current = game_next_in_game_player(big_blind_payer);
   LOG("new current is %s\n", game.current->name);
 
   ui_refresh_msg(M1, "%s", "Paying blinds...");
@@ -296,10 +295,7 @@ void game_next_part() {
   }
   game.bet = 0;
 
-  game.current = dealer->next;
-  while (!game.current->is_in_game) {
-    game.current = game.current->next;
-  }
+  game.current = game_next_in_game_player(dealer);
 }
 
 void game_collect_bank() {
@@ -364,13 +360,11 @@ void game_choose_winner() {
 }
 
 bool_t game_declare_tie() {
-  counter_t i, msgs;
-  counter_t ties;
+  counter_t i, msgs = 0;
+  counter_t ties = 0;
   unsigned short part_size;
   char header[255];
   char msg[4][W_INFO_WIDTH-2];
-
-  ties = 0;
 
   FOR_EACH_PLAYER(i)
     if (game.players[i].is_tie) ties++;
@@ -383,8 +377,6 @@ bool_t game_declare_tie() {
 
   game_collect_bank();
   sprintf(header, "[ Round %u summary ]", game.r_number);
-
-  msgs = 0;
 
   FOR_EACH_PLAYER(i) {
     if (game.players[i].is_tie) {

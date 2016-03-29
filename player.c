@@ -9,7 +9,6 @@
 #include "settings.h"
 #include "ai.h"
 
-
 void player_bet(player_t* player, unsigned short amount) {
   amount = (player->cash >= amount) ? amount : player->cash;
   player->cash -= amount;
@@ -135,6 +134,7 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
   counter_t i;
   card_t *p[] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
   char str_combo[255];
+  player_t* new_winner = NULL;
 
   player_fill_pool(player, p);
   card_combo_to_text(str_combo, pok_resolve(p, POOL_SIZE));
@@ -145,9 +145,8 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
       pool[i] = p[i];
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
     player->is_cards_opened = TRUE;
-    ui_refresh();
-    ui_wait_any_key();
-    return player;
+    new_winner = player;
+    goto out;
   }
 
   if (pok_compare(pool, p) == pool) {
@@ -155,9 +154,8 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
     set_msg(M1, "%s folds. Press any key.", player->name);
     player_bank(player);
     player->is_in_game = FALSE;
-    ui_refresh();
-    ui_wait_any_key();
-    return yet_winner;
+    new_winner = yet_winner;
+    goto out;
   }
 
   if (pok_compare(pool, p) == p) {
@@ -178,9 +176,8 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
       pool[i] = p[i];
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
     player->is_cards_opened = TRUE;
-    ui_refresh();
-    ui_wait_any_key();
-    return player;
+    new_winner = player;
+    goto out;
   }
 
   if (pok_compare(pool, p) == NULL) {
@@ -189,12 +186,14 @@ player_t* player_reveal(player_t *player, player_t *yet_winner, card_t **pool) {
     yet_winner->is_tie = TRUE;
     set_msg(M1, "%s reveals %s. Press any key.", player->name, str_combo);
     player->is_cards_opened = TRUE;
-    ui_refresh();
-    ui_wait_any_key();
-    return yet_winner;
+    new_winner = yet_winner;
+    goto out;
   }
 
-  return NULL;  /* unreachable */
+ out:
+  ui_refresh();
+  ui_wait_any_key();
+  return new_winner;
 }
 
 bool_t can_bet(player_t* player) {

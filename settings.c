@@ -152,18 +152,14 @@ void field_update(field_t f, int sign) {
     case F_AI_DIFF:
       settings.ai_diff = get_new_value(settings.ai_diff, 1*sign, DUMB, SMARTER);
       break;
-    break;
     case F_CASH:
       settings.cash = get_new_value(settings.cash, 50*sign, 50, 10000);
       break;
-    break;
     case F_BLIND:
       settings.blind = get_new_value(settings.blind, 2*sign, 2, 100);
       break;
-    break;
     case F_BET:
       settings.max_bet = get_new_value(settings.max_bet, 20*sign, 20, 1000);
       break;
-    break;
   }
 }

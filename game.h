@@ -20,8 +20,6 @@ typedef struct game_t {
 } game_t;
 
 extern game_t game;
-extern card_t* global_pool[GLOBAL_POOL_SIZE];
-extern card_t* pool[POOL_SIZE];
 
 void game_init();
 void game_start();
@@ -40,6 +38,7 @@ void game_collect_bank();
 void game_choose_winner();
 bool_t game_declare_tie();
 void game_declare_winner();
+player_t* game_next_in_game_player(player_t* player);
 
 /* for test purposes */
 void game_deal_specific(const char* player0card1,

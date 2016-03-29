@@ -85,7 +85,6 @@ void print_panel(int x, int y) {
 }
 
 void ui_init() {
-
   initscr();
   cbreak();
   keypad(stdscr, TRUE);
@@ -224,7 +223,7 @@ byte_t fill_choices(char** choices, player_t* player, size_t size) {
 
 void print_choices(int y, int x, char** choices, size_t size) {
   counter_t i;
-  /*LOG("printing menu y = %d x = %d choice = %d\n", y, x, game.ui_choice);*/
+
   for(i = 0; i < size; i++) {
     if (choices[i]) {
       if (game.ui_choice == i) {
@@ -239,7 +238,6 @@ void print_choices(int y, int x, char** choices, size_t size) {
 }
 
 decision_t decode_choice(char* choice) {
-  /*LOG("%s|%s|%s|%s|%s\n", choice, M_CHECK, M_CALL, M_BET, M_RAISE);*/
   if (!strcmp(choice, M_CHECK)) return CHECK;
   if (!strcmp(choice, M_CALL)) return CALL;
   if (!strcmp(choice, M_BET)) return BET;

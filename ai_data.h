@@ -16,7 +16,7 @@ static const byte_t preflop_strength[13][13] =
 
 static const byte_t combo_strength[9][3] =
              /* FLOP  TURN  RIVER */
-/*HIGH CARD*/{{   20,   10,    0},
+/*HIGH CARD*/{{   30,   15,    0},
 /*PAIR*/      {   50,   25,   10},
 /*PAIRS*/     {   70,   50,   40},
 /*THREE*/     {  100,   70,   50},
