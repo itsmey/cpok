@@ -210,5 +210,5 @@ bool_t can_check(player_t* player) {
 }
 
 bool_t can_raise(player_t* player) {
-  return (game.bet != 0);
+  return ((game.bet != 0) && (game.bet < settings.max_bet));
 }
